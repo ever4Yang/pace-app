@@ -2,7 +2,7 @@ import React, { type FC, useMemo } from 'react';
 
 import styled from 'styled-components/native';
 
-import { formatDistance, formatDuration } from '@activity';
+import { formatDistance, formatDuration, getUnitLabels } from '@activity';
 
 import useActivitiesByIds from '@api/activity/useActivitiesByIds';
 import useActivityTimeline from '@api/activity/useActivityTimeline';
@@ -133,9 +133,10 @@ const TrainingLogSummary: FC<Props> = ({
       { distance: 0, duration: 0 },
     );
 
+    const { distance: distUnit, durationLabels } = getUnitLabels(distanceMeasurementSystem);
     return {
-      distance: formatDistance(stats.distance, distanceMeasurementSystem, true),
-      duration: formatDuration(stats.duration, true),
+      distance: formatDistance(stats.distance, distanceMeasurementSystem, true, distUnit),
+      duration: formatDuration(stats.duration, true, durationLabels.h, durationLabels.min, durationLabels.sec),
     };
   }, [activitiesData, distanceMeasurementSystem]);
 

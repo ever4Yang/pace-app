@@ -51,7 +51,6 @@ const ActivityDetailsUI: FC<Props> = ({
     isError: isMapSnapshotError,
   } = useActivityMapSnapshot({
     activityId: activity?.id,
-    activityEncryptionKey: activity?.encryptionKey,
     mapSnapshotTheme: theme.dark ? 'dark' : 'light',
   });
 
@@ -61,7 +60,6 @@ const ActivityDetailsUI: FC<Props> = ({
     isError: isActivityLocationsError,
   } = useActivityLocations({
     activityId: activity?.id,
-    activityEncryptionKey: activity?.encryptionKey,
   });
 
   const goToZoomableMap = useCallback((): void => {
@@ -118,7 +116,7 @@ const ActivityDetailsUI: FC<Props> = ({
     <>
       <ActivityDetails
         summary={activity?.summary as ActivitySummary | null}
-        mapSnapshot={mapSnapshotData?.mapSnapshot}
+        mapSnapshot={mapSnapshotData?.mapSnapshot ?? undefined}
         mapSnapshotFetching={isMapSnapshotLoading}
         mapSnapshotError={isMapSnapshotError}
         locations={activityLocationsData?.locations}

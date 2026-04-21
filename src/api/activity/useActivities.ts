@@ -2,59 +2,42 @@ import { useCallback } from 'react';
 
 import { type InfiniteData, type UseQueryResult } from '@tanstack/react-query';
 
-import { decryptActivity } from '@activity';
-import { type ProfileData, useAuth } from '@auth';
+import useActivityTimeline from '@api/activity/useActivityTimeline';
 
-import useActivityTimeline, {
-  type ActivityTimelineData,
-  type EncryptedActivityTimelineData,
-} from '@api/activity/useActivityTimeline';
+import type { Activity } from '@models/Activity';
 
 const PAGE_SIZE = 5;
 
+type ActivityPage = {
+  activities: Activity[];
+  nextCursor: string | undefined;
+};
+
 export default function useActivities(
   page: number,
-): UseQueryResult<InfiniteData<ActivityTimelineData>, Error> {
-  const { getProfileData } = useAuth();
-
+): UseQueryResult<InfiniteData<ActivityPage>, Error> {
   const select = useCallback(
-    (data: EncryptedActivityTimelineData) => {
-      const profileData = getProfileData() as ProfileData;
-
-      const paginatedData: InfiniteData<ActivityTimelineData> = {
+    (data: Activity[]) => {
+      const paginatedData: InfiniteData<ActivityPage> = {
         pages: [],
         pageParams: [],
       };
 
       let i = 0;
       while (i < (page + 1) * PAGE_SIZE) {
-        const pageActivities = data.activities.slice(i, i + PAGE_SIZE);
+        const pageActivities = data.slice(i, i + PAGE_SIZE);
         const nextCursor =
-          i + PAGE_SIZE + 1 < data.activities.length
-            ? data.activities[i + PAGE_SIZE + 1].id
-            : undefined;
+          i + PAGE_SIZE + 1 < data.length ? data[i + PAGE_SIZE + 1].id : undefined;
 
-        paginatedData.pages.push({
-          // @ts-ignore
-          activities: pageActivities
-            .map((activity) => {
-              try {
-                return decryptActivity(activity, profileData.keyPairs.encryptionKeyPair);
-              } catch {
-                return null;
-              }
-            })
-            .filter((activity) => activity?.summary),
-          nextCursor,
-        });
+        paginatedData.pages.push({ activities: pageActivities, nextCursor });
         paginatedData.pageParams.push(nextCursor);
         i += PAGE_SIZE;
       }
 
       return paginatedData;
     },
-    [getProfileData, page],
+    [page],
   );
 
-  return useActivityTimeline<InfiniteData<ActivityTimelineData>>(select);
+  return useActivityTimeline<InfiniteData<ActivityPage>>(select);
 }

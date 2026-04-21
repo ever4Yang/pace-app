@@ -10,12 +10,16 @@ import styled from 'styled-components/native';
 
 import { useTheme } from '@theme';
 
+import { useLocale } from '@translations/LocaleProvider';
+
 import ActivityTypeBottomSheet from '@components/common/activity/ActivityTypeBottomSheet';
 
 import { type ActivityTaskState, ActivityType } from '@models/Activity';
 import type { DistanceMeasurementSystem } from '@models/UnitSystem';
 
 import ActivityTask, { ActivityListener } from '@tasks/ActivityTask';
+
+import useLocalizedMapStyle from '@utils/useLocalizedMapStyle';
 
 import { MAPTILER_URL_DARK, MAPTILER_URL_LIGHT } from '../../consts';
 import ActivityRunning from './ActivityRunning';
@@ -79,6 +83,11 @@ const RecordUI: FC<Props> = ({
 
   const router = useRouter();
   const theme = useTheme();
+  const { locale } = useLocale();
+  const styleURL = useLocalizedMapStyle(
+    theme.dark ? MAPTILER_URL_DARK : MAPTILER_URL_LIGHT,
+    locale,
+  );
 
   const onRecenterMap = useCallback((): void => {
     setFollowUserLocation(true);
@@ -152,7 +161,7 @@ const RecordUI: FC<Props> = ({
     <>
       <Wrapper>
         <StyledMapView
-          styleURL={theme.dark ? MAPTILER_URL_DARK : MAPTILER_URL_LIGHT}
+          styleURL={styleURL}
           logoEnabled={false}
           attributionEnabled
           attributionPosition={{ bottom: 8, right: 8 }}

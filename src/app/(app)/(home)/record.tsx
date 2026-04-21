@@ -133,6 +133,17 @@ const RecordScreen: FC = () => {
     setActivityType(preferencesData?.defaultActivityType || ActivityType.RUNNING);
   }, [isFetchingPreferences, preferencesData?.defaultActivityType]);
 
+  useEffect(() => {
+    if (!isFocused || activityState === 'notStarted') {
+      return;
+    }
+
+    // If the task was reset externally (e.g. after saving), sync UI state back to idle
+    if (activityTask.startTimestamp === 0) {
+      setActivityState('notStarted');
+    }
+  }, [isFocused]);
+
   return (
     <RecordUI
       activityType={activityType || ActivityType.RUNNING}

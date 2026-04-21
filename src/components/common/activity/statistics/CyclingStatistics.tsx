@@ -8,6 +8,7 @@ import {
   formatSpeed,
   getElevationGainInMeters,
   getMovingDurationInSeconds,
+  getUnitLabels,
 } from '@activity';
 
 import i18n from '@translations/i18n';
@@ -29,20 +30,29 @@ const CyclingStatistics: FC<ActivityStatisticsProps> = ({
 }) => {
   const { distance, duration, pace, calories } = summary;
 
-  const formattedDistance = useMemo(
-    () => formatDistance(distance, distanceMeasurementSystem),
-    [distance, distanceMeasurementSystem],
+  const unitLabels = useMemo(
+    () => getUnitLabels(distanceMeasurementSystem),
+    [distanceMeasurementSystem],
   );
 
-  const formattedDuration = useMemo(() => formatDuration(duration), [duration]);
+  const formattedDistance = useMemo(
+    () => formatDistance(distance, distanceMeasurementSystem, undefined, unitLabels.distance),
+    [distance, distanceMeasurementSystem, unitLabels.distance],
+  );
+
+  const formattedDuration = useMemo(() => {
+    const { h, min, sec } = unitLabels.durationLabels;
+    return formatDuration(duration, undefined, h, min, sec);
+  }, [duration, unitLabels.durationLabels]);
 
   const formattedMovingDuration = useMemo(() => {
     if (!locations || locations[0].segment === undefined) {
       return formattedDuration;
     }
 
-    return formatDuration(getMovingDurationInSeconds(locations));
-  }, [formattedDuration, locations]);
+    const { h, min, sec } = unitLabels.durationLabels;
+    return formatDuration(getMovingDurationInSeconds(locations), undefined, h, min, sec);
+  }, [formattedDuration, locations, unitLabels.durationLabels]);
 
   const formattedElevation = useMemo(() => {
     if (!locations) {
@@ -50,12 +60,12 @@ const CyclingStatistics: FC<ActivityStatisticsProps> = ({
     }
 
     const elevation = getElevationGainInMeters(locations);
-    return formatElevation(elevation, distanceMeasurementSystem);
-  }, [distanceMeasurementSystem, locations]);
+    return formatElevation(elevation, distanceMeasurementSystem, undefined, unitLabels.elevation);
+  }, [distanceMeasurementSystem, locations, unitLabels.elevation]);
 
   const formattedSpeed = useMemo(
-    () => formatSpeed(pace, distanceMeasurementSystem),
-    [distanceMeasurementSystem, pace],
+    () => formatSpeed(pace, distanceMeasurementSystem, undefined, unitLabels.speed),
+    [distanceMeasurementSystem, pace, unitLabels.speed],
   );
 
   const formattedCalories = useMemo(() => {
@@ -63,8 +73,8 @@ const CyclingStatistics: FC<ActivityStatisticsProps> = ({
       return null;
     }
 
-    return formatCalories(calories);
-  }, [calories]);
+    return formatCalories(calories, unitLabels.calories);
+  }, [calories, unitLabels.calories]);
 
   return (
     <Wrapper>

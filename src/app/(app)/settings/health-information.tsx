@@ -53,12 +53,12 @@ const ConfigureHealthInformationScreen: FC = () => {
   const { handleSubmit, formState, ...formMethods } = useForm<HealthInformation>({
     resolver: yupResolver(schema),
     defaultValues: {
-      gender: healthInformationData?.healthInformation.gender,
-      birthDate: healthInformationData?.healthInformation.birthDate,
+      gender: healthInformationData?.gender,
+      birthDate: healthInformationData?.birthDate,
       weight:
         preferencesData?.measurement === DistanceMeasurementSystem.IMPERIAL && healthInformationData
-          ? Math.round(convertKilogramsToPounds(healthInformationData?.healthInformation.weight))
-          : Math.round(healthInformationData?.healthInformation.weight || 0),
+          ? Math.round(convertKilogramsToPounds(healthInformationData.weight))
+          : Math.round(healthInformationData?.weight || 0),
     },
   });
 
@@ -81,7 +81,6 @@ const ConfigureHealthInformationScreen: FC = () => {
 
       updateHealthInformation({
         healthInformation: newHealthInformation,
-        encryptionKey: healthInformationData?.encryptionKey,
         preferences: preferencesData,
       });
 
@@ -89,7 +88,6 @@ const ConfigureHealthInformationScreen: FC = () => {
     },
     [
       goToSettingsScreen,
-      healthInformationData,
       preferencesData,
       reset,
       updateHealthInformation,

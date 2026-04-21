@@ -1,20 +1,15 @@
 const activitiesKeys = {
   timeline: () => ['activities', 'timeline'],
-  locations: (activityId: string | undefined, activityEncryptionKey: string | undefined) => [
+  locations: (activityId: string | undefined) => ['activities', 'locations', activityId],
+  mapSnapshot: (activityId: string | undefined, theme: 'light' | 'dark') => [
     'activities',
-    'locations',
+    'mapSnapshot',
     activityId,
-    activityEncryptionKey,
+    theme,
   ],
-  mapSnapshot: (
-    activityId: string | undefined,
-    activityEncryptionKey: string | undefined,
-    theme: 'light' | 'dark',
-  ) => ['activities', 'mapSnapshot', activityId, activityEncryptionKey, theme],
   create: () => ['activities', 'create'],
   update: () => ['activities', 'update'],
   delete: () => ['activities', 'delete'],
-  uploadData: () => ['activities', 'uploadData'],
 };
 
 export default activitiesKeys;

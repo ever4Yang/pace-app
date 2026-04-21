@@ -11,7 +11,7 @@ import {
 } from 'date-fns';
 import styled from 'styled-components/native';
 
-import { formatDistance, formatDuration } from '@activity';
+import { formatDistance, formatDuration, getUnitLabels } from '@activity';
 
 import { Text } from '@components/ui';
 
@@ -145,10 +145,11 @@ const SummaryTile: FC<Props> = ({
       { distance: 0, duration: 0 },
     );
 
+    const { distance: distUnit, durationLabels } = getUnitLabels(distanceMeasurementSystem);
     return {
       numberActivities: activities.length,
-      distance: formatDistance(stats.distance, distanceMeasurementSystem, true),
-      duration: formatDuration(stats.duration, true),
+      distance: formatDistance(stats.distance, distanceMeasurementSystem, true, distUnit),
+      duration: formatDuration(stats.duration, true, durationLabels.h, durationLabels.min, durationLabels.sec),
     };
   }, [activities, distanceMeasurementSystem]);
 

@@ -53,7 +53,6 @@ export default {
     plugins: [
       'expo-font',
       'expo-router',
-      'expo-secure-store',
       '@maplibre/maplibre-react-native',
       [
         'expo-build-properties',

@@ -9,6 +9,7 @@ import {
   formatStopwatchDuration,
   getPaceInMinutesPerKilometers,
   getSpeedInKilometersPerHour,
+  getUnitLabels,
 } from '@activity';
 
 import { Text } from '@components/ui';
@@ -85,9 +86,14 @@ const ActivityStatistics: FC<Props> = ({
     [durationInSeconds],
   );
 
+  const unitLabels = useMemo(
+    () => getUnitLabels(distanceMeasurementSystem),
+    [distanceMeasurementSystem],
+  );
+
   const formattedDistance = useMemo(
-    () => formatDistance(activityTask.distance, distanceMeasurementSystem),
-    [activityTask.distance, distanceMeasurementSystem],
+    () => formatDistance(activityTask.distance, distanceMeasurementSystem, undefined, unitLabels.distance),
+    [activityTask.distance, distanceMeasurementSystem, unitLabels.distance],
   );
 
   const { paceLabel, formattedPace } = useMemo(() => {
@@ -100,7 +106,7 @@ const ActivityStatistics: FC<Props> = ({
 
       return {
         paceLabel: i18n.t('recordActivity.pace'),
-        formattedPace: formatPace(pace, distanceMeasurementSystem),
+        formattedPace: formatPace(pace, distanceMeasurementSystem, undefined, unitLabels.pace),
       };
     }
 
@@ -112,9 +118,9 @@ const ActivityStatistics: FC<Props> = ({
 
     return {
       paceLabel: i18n.t('recordActivity.speed'),
-      formattedPace: formatSpeed(speed, distanceMeasurementSystem),
+      formattedPace: formatSpeed(speed, distanceMeasurementSystem, undefined, unitLabels.speed),
     };
-  }, [activityTask.distance, activityType, durationInSeconds, distanceMeasurementSystem]);
+  }, [activityTask.distance, activityType, durationInSeconds, distanceMeasurementSystem, unitLabels]);
 
   return (
     <Wrapper>

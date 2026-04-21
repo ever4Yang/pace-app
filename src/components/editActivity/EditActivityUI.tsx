@@ -38,7 +38,6 @@ const EditActivityUI: FC<Props> = ({ activity, onSubmit }) => {
     isError: isActivityLocationsError,
   } = useActivityLocations({
     activityId: activity?.id,
-    activityEncryptionKey: activity?.encryptionKey,
   });
 
   const {
@@ -47,7 +46,6 @@ const EditActivityUI: FC<Props> = ({ activity, onSubmit }) => {
     isError: isMapSnapshotError,
   } = useActivityMapSnapshot({
     activityId: activity?.id,
-    activityEncryptionKey: activity?.encryptionKey,
     mapSnapshotTheme: theme.dark ? 'dark' : 'light',
   });
 
@@ -62,7 +60,7 @@ const EditActivityUI: FC<Props> = ({ activity, onSubmit }) => {
           ...(activity.summary as ActivitySummary),
           type: activityType || (activity.summary as ActivitySummary).type,
         }}
-        mapSnapshot={mapSnapshotData?.mapSnapshot}
+        mapSnapshot={mapSnapshotData?.mapSnapshot ?? undefined}
         mapSnapshotFetching={isMapSnapshotLoading}
         mapSnapshotError={isMapSnapshotError}
         locations={activityLocationsData?.locations}

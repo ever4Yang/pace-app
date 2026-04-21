@@ -52,7 +52,7 @@ const SaveScreen: FC = () => {
   const { data: preferencesData } = usePreferences();
   const {
     isPending: isCreateActivityLoading,
-    mutate: createActivity,
+    mutateAsync: createActivity,
     reset: resetCreateActivity,
   } = useCreateActivity();
 
@@ -83,10 +83,11 @@ const SaveScreen: FC = () => {
   const { handleSubmit, formState, ...formMethods } = useForm<FormData>({
     resolver: yupResolver(schema),
     defaultValues: { name: defaultName, type: activityType },
+    mode: 'onChange',
   });
 
   const goToHomeScreen = useCallback((): void => {
-    router.push('/');
+    router.navigate('/');
   }, [router]);
 
   const onCancel = useCallback((navigationEvent?: any): void => {
@@ -113,15 +114,19 @@ const SaveScreen: FC = () => {
         activityTask.startTimestamp,
         activityTask.endTimestamp,
         activityTask.distance,
-        healthInformationData?.healthInformation || null,
+        healthInformationData || null,
       );
 
-      createActivity({
-        summary,
-        locations: [...activityTask.locations],
-        mapSnapshot: activityTask.mapImageLight,
-        mapSnapshotDark: activityTask.mapImageDark,
-      });
+      try {
+        await createActivity({
+          summary,
+          locations: [...activityTask.locations],
+          mapSnapshot: activityTask.mapImageLight,
+          mapSnapshotDark: activityTask.mapImageDark,
+        });
+      } catch {
+        // insertActivity already ran — proceed with navigation
+      }
 
       activityTask.reset();
       navigation.removeListener('beforeRemove', onCancel);
@@ -131,7 +136,7 @@ const SaveScreen: FC = () => {
       activityTask,
       createActivity,
       goToHomeScreen,
-      healthInformationData?.healthInformation,
+      healthInformationData,
       navigation,
       onCancel,
       resetCreateActivity,

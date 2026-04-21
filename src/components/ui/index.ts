@@ -14,7 +14,6 @@ export {
   RedButtonLabel as ModalRedButtonLabel,
   GreenButtonLabel as ModalGreenButtonLabel,
 } from './Modal';
-export { default as PasswordStrengthBar } from './PasswordStrengthBar';
 export { default as PrimaryButton } from './PrimaryButton';
 export { default as SecondaryButton } from './SecondaryButton';
 export { default as Text } from './Text';

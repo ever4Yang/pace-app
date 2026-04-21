@@ -63,7 +63,7 @@ const SaveUI: FC<Props> = ({ distanceMeasurementSystem, uploading, onSubmit }) =
       duration,
       pace,
     };
-    if (!healthInformationData?.healthInformation) {
+    if (!healthInformationData) {
       return activitySummary;
     }
 
@@ -71,7 +71,7 @@ const SaveUI: FC<Props> = ({ distanceMeasurementSystem, uploading, onSubmit }) =
       activityType,
       pace,
       duration,
-      healthInformationData.healthInformation,
+      healthInformationData,
     );
     if (!calories) {
       return activitySummary;
@@ -83,7 +83,7 @@ const SaveUI: FC<Props> = ({ distanceMeasurementSystem, uploading, onSubmit }) =
     activityTask.endTimestamp,
     activityTask.distance,
     activityType,
-    healthInformationData?.healthInformation,
+    healthInformationData,
   ]);
 
   const onMapSnapshotLight = (snapshotUri: string): void => {

@@ -29,12 +29,12 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
@@ -44,10 +44,9 @@ jobs:
 
       - name: Setup Expo and EAS
         if: github.event.inputs.builder == 'eas'
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+        run: npm install -g eas-cli
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build APK with EAS
         if: github.event.inputs.builder == 'eas'
@@ -73,17 +72,10 @@ jobs:
 
       - name: Setup Java
         if: github.event.inputs.builder == 'local'
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
-
-      - name: Setup Expo (for prebuild)
-        if: github.event.inputs.builder == 'local'
-        uses: expo/expo-github-action@v8
-        with:
-          expo-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Generate native Android project
         if: github.event.inputs.builder == 'local'
@@ -113,7 +105,7 @@ jobs:
       # ── Common: upload & release ──────────────────────────────────────────────
 
       - name: Upload APK as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pace-android-${{ github.event.inputs.profile }}-${{ github.run_number }}
           path: pace-${{ github.event.inputs.profile }}.apk
@@ -123,23 +115,26 @@ jobs:
         id: meta
         run: |
           echo "date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+          echo "time=$(date +'%H%M')" >> $GITHUB_OUTPUT
+          echo "branch=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_OUTPUT
           echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
           echo "commit_time=$(git log -1 --format='%ci')" >> $GITHUB_OUTPUT
           echo "commit_msg=$(git log -1 --format='%s')" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ steps.meta.outputs.date }}-${{ github.event.repository.name }}-${{ github.run_number }}
-          name: ${{ steps.meta.outputs.date }}-${{ github.event.repository.name }}-${{ github.run_number }}
+          tag_name: ${{ github.event.repository.name }}_${{ steps.meta.outputs.branch }}_${{ steps.meta.outputs.date }}_${{ steps.meta.outputs.time }}
+          name: ${{ github.event.repository.name }}_${{ steps.meta.outputs.branch }}_${{ steps.meta.outputs.date }}_${{ steps.meta.outputs.time }}
           body: |
             ## Build Info
+            - **Branch:** ${{ steps.meta.outputs.branch }}
             - **Profile:** ${{ github.event.inputs.profile }}
             - **Builder:** ${{ github.event.inputs.builder }}
-            - **Run:** #${{ github.run_number }}
+          
 
             ## Commit
-            - **Message:** ${{ steps.meta.outputs.commit_msg }}
+            - **Message:** [${{ steps.meta.outputs.branch }}] ${{ steps.meta.outputs.commit_msg }}
             - **Hash:** `${{ steps.meta.outputs.commit_hash }}`
             - **Time:** ${{ steps.meta.outputs.commit_time }}
           files: pace-${{ github.event.inputs.profile }}.apk

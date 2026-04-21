@@ -6,7 +6,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { FormProvider, useForm } from 'react-hook-form';
 import { object, string } from 'yup';
 
-import useAccount from '@api/account/useAccount';
 import useDeleteProfilePicture from '@api/profilePicture/useDeleteProfilePicture';
 import useProfilePicture from '@api/profilePicture/useProfilePicture';
 import useUpdateProfilePicture from '@api/profilePicture/useUpdateProfilePicture';
@@ -26,7 +25,6 @@ const ChooseProfilePictureScreen: FC = () => {
   const router = useRouter();
   const navigation = useNavigation();
 
-  const { data: accountData } = useAccount();
   const { data: profilePictureData } = useProfilePicture();
   const {
     mutate: deleteProfilePicture,
@@ -106,7 +104,7 @@ const ChooseProfilePictureScreen: FC = () => {
   return (
     <FormProvider formState={formState} handleSubmit={handleSubmit} {...formMethods}>
       <ChooseProfilePictureUI
-        username={accountData?.username}
+        username={undefined}
         isUpdating={isUpdatingProfilePicture}
         isUpdatingError={isUpdateProfilePictureError}
         isDeleting={isDeletingProfilePicture}

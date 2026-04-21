@@ -1,32 +1,17 @@
 ![banner](.github/github-banner.png)
 
-# PACE - Private Fitness App
+# PACE - Local Fitness App
 
-PACE is an end-to-end encrypted fitness app that allows to record, track and analyse your trainings without compromising your privacy.
-
-The app is available on Android and iOS.
-
-### Android
-
-<a href="https://play.google.com/store/apps/details?id=io.withpace.pace">
-  <img width="185" alt="Get it on Google Play" src=".github/google-play-badge.png">
-</a>
-
-### iOS
-
-<a href="https://apps.apple.com/app/pace-privacy/id6444367013">
-  <img width="185" alt="Get it on the App Store" src=".github/apple-app-store-badge.png">
-</a>
+PACE is a local-only fitness app that allows you to record, track and analyse your workouts. All data is stored on-device using SQLite — no account, no server, no sync.
 
 ## Features
 
-- **End-to-end encryption**: All your data is encrypted on your device before it is sent to the server. The server never sees your data in plain text.
+- **Local storage**: All data is stored on-device with SQLite. Nothing leaves your phone.
+- **No sign-up required**: Open the app and start recording immediately.
 - **Running and bike rides**: Record your running and bike rides with GPS tracking.
-- **Offline mode**: Record your trainings without an internet connection. The app will sync your data with the server once you are online again.
-- **Anaylsis**: Analyse your trainings with detailed statistics and graphs.
-- **Weekly and monthly summaries**: Get a weekly and monthly summary of your trainings with the number of activities, distance and duration.
-- **Anonymous**: No email or personal information is required to use the app.
-- **No ads or tracking**: The app does not contain any ads.
+- **Offline**: Works entirely offline. No internet connection required except for map tiles.
+- **Analysis**: Analyse your workouts with detailed statistics and graphs.
+- **Weekly and monthly summaries**: Get a weekly and monthly summary of your activities with distance and duration.
 
 ## Building from source
 
@@ -40,10 +25,37 @@ PACE is built with [Expo](https://expo.io/), written in TypeScript.
    - Android: `npm run android`
    - iOS: `npm run ios`
 
-## Security
+## Building an Android APK locally
 
-You can read our whitepaper [here](https://withpace.io/pace-whitepaper.pdf).
+### Prerequisites
 
-## Community
+- **Java 17** — e.g. `sudo apt install openjdk-17-jdk` on Debian/Ubuntu
+- **Android SDK** — install via [Android Studio](https://developer.android.com/studio) or the standalone [command line tools](https://developer.android.com/studio#command-tools)
+  - Required SDK components: `platform-tools`, `build-tools;34.0.0`, `platforms;android-34`
+- Set environment variables (add to `~/.bashrc` or equivalent):
+  ```bash
+  export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+  export ANDROID_HOME=$HOME/android-sdk
+  export ANDROID_SDK_ROOT=$ANDROID_HOME
+  export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
+  ```
 
-Follow us on [Twitter](https://twitter.com/withpaceio) for updates and announcements.
+### Build
+
+```bash
+# First time, or after changing app.config.js (generates the android/ project):
+npm run android:prebuild
+
+# Build a debug APK:
+npm run android:debug
+# Output: android/app/build/outputs/apk/debug/app-debug.apk
+
+# Build a release APK:
+npm run android:release
+# Output: android/app/build/outputs/apk/release/
+
+# Prebuild + debug in one command:
+npm run android:build
+```
+
+> The first build downloads Gradle and all dependencies (~10–15 min). Subsequent builds are much faster.
