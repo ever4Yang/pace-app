@@ -139,11 +139,6 @@ export default {
       },
     },
   },
-  manageSubscription: {
-    freeTrial: 'Free plan',
-    monthlySubscription: 'Monthly subscription',
-    yearlySubscription: 'Yearly subscription',
-  },
   changePassword: {
     screenTitle: 'Change password',
     label: 'Password',
@@ -190,18 +185,7 @@ export default {
     success: 'Verification email sent!',
     failure: 'Failed to send the verification email.',
   },
-  restorePurchases: {
-    failure: 'Failed to restore purchases.',
-  },
   deleteAccount: {
-    requiredActionModal: {
-      title: 'Action required',
-      explanation:
-        'You must cancel your subscription on the {{store}} before deleting your account.',
-      buttons: {
-        close: 'Close',
-      },
-    },
     confirmModal: {
       title: 'Are you sure you want to delete your account?',
       explanation: 'All your data and activities will be permanently deleted.',
@@ -225,8 +209,6 @@ export default {
     displayPreferences: 'Display preferences',
     healthInformation: 'Health information',
     defaultActivityType: 'Default activity type',
-    manageSubscription: 'Manage subscription',
-    restorePurchases: 'Restore purchases',
     deleteAccount: 'Delete account',
     configureRecoveryEmail: 'Configure',
     saveRecoveryEmail: 'Save',

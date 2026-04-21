@@ -13,7 +13,6 @@
       "@crypto": ["crypto"],
       "@models/*": ["models/*"],
       "@navigation/*": ["navigation/*"],
-      "@subscription/*": ["subscription/*"],
       "@screens/*": ["screens/*"],
       "@tasks/*": ["tasks/*"],
       "@theme": ["theme"],

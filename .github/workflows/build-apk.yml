@@ -4,17 +4,25 @@ on:
   workflow_dispatch:
     inputs:
       profile:
-        description: 'EAS build profile'
+        description: 'Build profile'
         required: true
         default: 'preview'
         type: choice
         options:
           - development
           - preview
+      builder:
+        description: 'Build method'
+        required: true
+        default: 'local'
+        type: choice
+        options:         
+          - local
+          - eas
 
 jobs:
   build:
-    name: Build Android APK (${{ github.event.inputs.profile }})
+    name: Build Android APK (${{ github.event.inputs.profile }}, ${{ github.event.inputs.builder }})
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -32,13 +40,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # ── EAS (cloud) path ──────────────────────────────────────────────────────
+
       - name: Setup Expo and EAS
+        if: github.event.inputs.builder == 'eas'
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build APK with EAS
+        if: github.event.inputs.builder == 'eas'
         id: eas-build
         run: |
           OUTPUT=$(eas build \
@@ -51,10 +63,54 @@ jobs:
           URL=$(echo "$OUTPUT" | jq -r '.[0].artifacts.buildUrl')
           echo "apk_url=$URL" >> $GITHUB_OUTPUT
 
-      - name: Download APK
+      - name: Download APK (EAS)
+        if: github.event.inputs.builder == 'eas'
         run: |
           curl -L "${{ steps.eas-build.outputs.apk_url }}" \
             -o "pace-${{ github.event.inputs.profile }}.apk"
+
+      # ── Local (on-runner) path ────────────────────────────────────────────────
+
+      - name: Setup Java
+        if: github.event.inputs.builder == 'local'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Expo (for prebuild)
+        if: github.event.inputs.builder == 'local'
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Generate native Android project
+        if: github.event.inputs.builder == 'local'
+        run: npx expo prebuild --platform android --non-interactive
+        env:
+          APP_VARIANT: ${{ github.event.inputs.profile }}
+          EXPO_PUBLIC_API_URL: ${{ secrets.EXPO_PUBLIC_API_URL }}
+          EXPO_PUBLIC_MAPTILER_API_KEY: ${{ secrets.EXPO_PUBLIC_MAPTILER_API_KEY }}
+
+      - name: Build APK locally
+        if: github.event.inputs.builder == 'local'
+        run: |
+          cd android
+          if [ "${{ github.event.inputs.profile }}" = "development" ]; then
+            ./gradlew assembleDebug
+            cp app/build/outputs/apk/debug/app-debug.apk \
+              ../pace-${{ github.event.inputs.profile }}.apk
+          else
+            ./gradlew assembleRelease
+            APK=$(find app/build/outputs/apk/release -name "*.apk" | head -1)
+            cp "$APK" ../pace-${{ github.event.inputs.profile }}.apk
+          fi
+        env:
+          EXPO_PUBLIC_API_URL: ${{ secrets.EXPO_PUBLIC_API_URL }}
+          EXPO_PUBLIC_MAPTILER_API_KEY: ${{ secrets.EXPO_PUBLIC_MAPTILER_API_KEY }}
+
+      # ── Common: upload & release ──────────────────────────────────────────────
 
       - name: Upload APK as artifact
         uses: actions/upload-artifact@v4
@@ -79,6 +135,7 @@ jobs:
           body: |
             ## Build Info
             - **Profile:** ${{ github.event.inputs.profile }}
+            - **Builder:** ${{ github.event.inputs.builder }}
             - **Run:** #${{ github.run_number }}
 
             ## Commit

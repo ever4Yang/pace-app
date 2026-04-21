@@ -92,12 +92,6 @@ const AppLayout: FC = () => {
         }}
       />
       <Stack.Screen
-        name="settings/paywall"
-        options={{
-          headerTitle: i18n.t('paywall.screenTitle'),
-        }}
-      />
-      <Stack.Screen
         name="settings/profile-picture"
         options={{
           headerTitle: i18n.t('settings.chooseProfilePicture.screenTitle'),

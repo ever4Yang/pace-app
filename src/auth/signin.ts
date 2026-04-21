@@ -7,8 +7,6 @@ import {
   decodeUtf8,
   encodeBase64,
 } from 'react-native-nacl-jsi';
-import Purchases from 'react-native-purchases';
-
 import { ARGON2ID_ITERATIONS, HKDF_PASSWORD_TOKEN_LENGTH } from '@crypto';
 
 import type { SignInResponse } from '@models/SignIn';
@@ -119,8 +117,6 @@ export default async function signIn(
     authToken,
     profileData,
   });
-
-  await Purchases.logIn(userId);
 
   return {
     userId,

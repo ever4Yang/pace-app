@@ -1,7 +1,5 @@
 import * as FileSystem from 'expo-file-system';
 
-import Purchases from 'react-native-purchases';
-
 import { deleteProfile } from './storage';
 
 export default async function signOut(): Promise<void> {
@@ -20,8 +18,4 @@ export default async function signOut(): Promise<void> {
     } catch {}
   }
 
-  try {
-    await Purchases.logOut();
-    // eslint-disable-next-line no-empty
-  } catch {}
 }

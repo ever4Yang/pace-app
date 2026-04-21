@@ -15,9 +15,7 @@ import {
   DeleteAccountButton,
   DisplayPreferencesButton,
   HealthInformationButton,
-  ManageSubscriptionButton,
   RecoveryEmailButton,
-  RestorePurchaseButton,
   SignOutButton,
   SportPreferencesButton,
 } from './buttons';
@@ -74,8 +72,6 @@ const SettingsUI: FC<Props> = ({ onDeleteAccount }) => {
         <RecoveryEmailButton />
         <ChangePasswordButton />
         <Separator />
-        <ManageSubscriptionButton />
-        <RestorePurchaseButton />
         <DeleteAccountButton onDeleteAccount={onDeleteAccount} />
         <Separator />
         <SignOutButton />

@@ -14,7 +14,6 @@ module.exports = {
           '@models': './src/models',
           '@navigation': './src/navigation',
           '@screens': './src/screens',
-          '@subscription': './src/subscription',
           '@tasks': './src/tasks',
           '@theme': './src/theme',
           '@translations': './src/translations',

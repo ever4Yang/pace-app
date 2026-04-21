@@ -4,14 +4,10 @@ import useDeleteAccount from '@api/account/useDeleteAccount';
 import useSignOut from '@api/auth/useSignOut';
 
 import ConfirmDeleteAccountModal from '@components/settings/ConfirmDeleteAccountModal';
-import DeleteAccountWarningModal from '@components/settings/DeleteAccountWarningModal';
 import DeletingAccountModal from '@components/settings/DeletingAccountModal';
 import SettingsUI from '@components/settings/SettingsUI';
 
-import useCurrentSubscription from '@subscription/useCurrentSubscription';
-
 const SettingsScreen: FC = () => {
-  const [deleteAccountWarningModalVisible, setDeleteAccountWarningModalVisible] = useState(false);
   const [confirmDeleteAccountModalVisible, setConfirmDeleteAccountModalVisible] = useState(false);
   const [deletingAccountModalVisible, setDeletingAccountModalVisible] = useState(false);
 
@@ -22,16 +18,9 @@ const SettingsScreen: FC = () => {
   } = useDeleteAccount();
   const { mutate: signOut } = useSignOut();
 
-  const { currentSubscription } = useCurrentSubscription();
-
   const onDeleteAccount = useCallback((): void => {
-    if (currentSubscription !== null) {
-      setDeleteAccountWarningModalVisible(true);
-      return;
-    }
-
     setConfirmDeleteAccountModalVisible(true);
-  }, [currentSubscription]);
+  }, []);
 
   const deleteAccountAndSignOut = useCallback(async (): Promise<void> => {
     setConfirmDeleteAccountModalVisible(false);
@@ -46,10 +35,6 @@ const SettingsScreen: FC = () => {
   return (
     <>
       <SettingsUI onDeleteAccount={onDeleteAccount} />
-      <DeleteAccountWarningModal
-        visible={deleteAccountWarningModalVisible}
-        onClose={() => setDeleteAccountWarningModalVisible(false)}
-      />
       <ConfirmDeleteAccountModal
         visible={confirmDeleteAccountModalVisible}
         onConfirm={deleteAccountAndSignOut}

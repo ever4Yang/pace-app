@@ -8,7 +8,6 @@ import errorView from './errorView';
 import home from './home';
 import onboarding from './onboarding';
 import passwordStrength from './passwordStrength';
-import paywall from './paywall';
 import recordActivity from './recordActivity';
 import saveActivity from './saveActivity';
 import sessionExpiredModal from './sessionExpiredModal';
@@ -30,7 +29,6 @@ export default {
   home,
   onboarding,
   passwordStrength,
-  paywall,
   recordActivity,
   saveActivity,
   sessionExpiredModal,

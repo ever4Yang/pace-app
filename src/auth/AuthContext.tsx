@@ -8,7 +8,6 @@ import React, {
   useReducer,
 } from 'react';
 
-import Purchases from 'react-native-purchases';
 import styled from 'styled-components/native';
 
 import { PaceIcon } from '@components/icons';
@@ -164,8 +163,6 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       onSignOut();
       return;
     }
-
-    await Purchases.logIn(profile.userId);
 
     dispatch({
       type: 'AUTH_RESTORE_PROFILE',

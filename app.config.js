@@ -19,7 +19,6 @@ export default {
         'ACCESS_FINE_LOCATION',
         'FOREGROUND_SERVICE',
         'FOREGROUND_SERVICE_LOCATION',
-        'BILLING',
       ],
       blockedPermissions: ['RECORD_AUDIO'],
       adaptiveIcon: {

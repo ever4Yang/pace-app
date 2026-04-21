@@ -1,5 +1,5 @@
 import { type FC, useCallback, useEffect, useState } from 'react';
-import { AppState, type AppStateStatus, Platform } from 'react-native';
+import { AppState, type AppStateStatus } from 'react-native';
 
 import { Slot, SplashScreen } from 'expo-router';
 
@@ -13,7 +13,6 @@ import {
 import { focusManager, onlineManager, useIsRestoring } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-get-random-values';
-import Purchases from 'react-native-purchases';
 import styled, { ThemeProvider } from 'styled-components/native';
 
 import { AuthProvider } from '@auth';
@@ -22,8 +21,6 @@ import { useTheme } from '@theme';
 import QueryClientProvider from '@components/QueryClientProvider';
 
 import loadFonts from '@utils/loadFonts';
-
-import { REVENUE_CAT_API_KEY_ANDROID, REVENUE_CAT_API_KEY_IOS } from '../consts';
 
 MapLibreGL.setAccessToken(null);
 
@@ -45,13 +42,6 @@ const RootLayout: FC = () => {
     setFontLoaded(true);
   }, []);
 
-  const loadPurchases = useCallback((): void => {
-    Purchases.setLogLevel(__DEV__ ? Purchases.LOG_LEVEL.DEBUG : Purchases.LOG_LEVEL.INFO);
-    Purchases.configure({
-      apiKey: Platform.OS === 'ios' ? REVENUE_CAT_API_KEY_IOS : REVENUE_CAT_API_KEY_ANDROID,
-    });
-  }, []);
-
   const onLayoutRootView = useCallback(async (): Promise<void> => {
     if (!fontLoaded || isRestoring || !netInfoReady) {
       return;
@@ -63,10 +53,6 @@ const RootLayout: FC = () => {
   useEffect(() => {
     load();
   }, [load]);
-
-  useEffect(() => {
-    loadPurchases();
-  }, [loadPurchases]);
 
   useEffect(() => {
     const listener = AppState.addEventListener('change', (status: AppStateStatus) => {

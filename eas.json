@@ -22,8 +22,7 @@
       "channel": "preview",
       "env": {
         "EXPO_PUBLIC_API_URL": "https://api.withpace.io",
-        "EXPO_PUBLIC_WEB_URL": "https://withpace.io",
-        "EXPO_PUBLIC_NUMBER_FREE_ACTIVITIES": "10"
+        "EXPO_PUBLIC_WEB_URL": "https://withpace.io"
       },
       "android": {
         "buildType": "apk"
@@ -34,8 +33,7 @@
       "env": {
         "APP_VARIANT": "production",
         "EXPO_PUBLIC_API_URL": "https://api.withpace.io",
-        "EXPO_PUBLIC_WEB_URL": "https://withpace.io",
-        "EXPO_PUBLIC_NUMBER_FREE_ACTIVITIES": "10"
+        "EXPO_PUBLIC_WEB_URL": "https://withpace.io"
       }
     }
   },
