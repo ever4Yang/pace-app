@@ -68,3 +68,5 @@ buck-out/
 android/
 ios/
 web-build/
+#env
+.env

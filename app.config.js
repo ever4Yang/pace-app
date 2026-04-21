@@ -4,8 +4,8 @@ export default {
   expo: {
     name: IS_DEV ? 'PACE (Dev)' : 'PACE',
     description: 'Private Fitness App',
-    slug: 'pace',
-    scheme: IS_DEV ? 'io.withpace.pace.dev' : 'io.withpace.pace',
+    slug: 'mykeep',
+    scheme: IS_DEV ? 'com.freedy.keep.dev' : 'com.freedy.keep',
     splash: {
       image: './assets/images/splash.png',
       backgroundColor: '#000000',
@@ -13,7 +13,7 @@ export default {
     userInterfaceStyle: 'automatic',
     icon: './assets/images/app-icon.png',
     android: {
-      package: IS_DEV ? 'io.withpace.pace.dev' : 'io.withpace.pace',
+      package: IS_DEV ? 'com.freedy.keep.dev' : 'com.freedy.keep',
       versionCode: 16,
       permissions: [
         'ACCESS_FINE_LOCATION',
@@ -28,7 +28,7 @@ export default {
       },
     },
     ios: {
-      bundleIdentifier: IS_DEV ? 'io.withpace.pace.dev' : 'io.withpace.pace',
+      bundleIdentifier: IS_DEV ? 'com.freedy.keep.dev' : 'com.freedy.keep',
       buildNumber: '15',
       infoPlist: {
         NSLocationAlwaysAndWhenInUseUsageDescription:
@@ -66,14 +66,14 @@ export default {
     ],
     extra: {
       eas: {
-        projectId: 'bbc52990-d7d4-11e9-a07a-3d3351b36399',
+        projectId: 'bdfe803a-1991-41a6-bc46-d93a9ee9ffd8',
       },
     },
     runtimeVersion: {
       policy: 'sdkVersion',
     },
     updates: {
-      url: 'https://u.expo.dev/bbc52990-d7d4-11e9-a07a-3d3351b36399',
+      url: 'https://u.expo.dev/bdfe803a-1991-41a6-bc46-d93a9ee9ffd8',
     },
   },
 };
