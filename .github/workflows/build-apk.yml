@@ -16,6 +16,8 @@ jobs:
   build:
     name: Build Android APK (${{ github.event.inputs.profile }})
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Check out repository
@@ -60,3 +62,27 @@ jobs:
           name: pace-android-${{ github.event.inputs.profile }}-${{ github.run_number }}
           path: pace-${{ github.event.inputs.profile }}.apk
           retention-days: 30
+
+      - name: Collect release metadata
+        id: meta
+        run: |
+          echo "date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+          echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "commit_time=$(git log -1 --format='%ci')" >> $GITHUB_OUTPUT
+          echo "commit_msg=$(git log -1 --format='%s')" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.date }}-${{ github.event.repository.name }}-${{ github.run_number }}
+          name: ${{ steps.meta.outputs.date }}-${{ github.event.repository.name }}-${{ github.run_number }}
+          body: |
+            ## Build Info
+            - **Profile:** ${{ github.event.inputs.profile }}
+            - **Run:** #${{ github.run_number }}
+
+            ## Commit
+            - **Message:** ${{ steps.meta.outputs.commit_msg }}
+            - **Hash:** `${{ steps.meta.outputs.commit_hash }}`
+            - **Time:** ${{ steps.meta.outputs.commit_time }}
+          files: pace-${{ github.event.inputs.profile }}.apk
