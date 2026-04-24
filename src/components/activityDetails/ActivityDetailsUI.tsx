@@ -2,7 +2,7 @@ import React, { type FC, useCallback, useRef } from 'react';
 
 import { useRouter } from 'expo-router';
 
-import type GorohmBottomSheet from '@gorhom/bottom-sheet';
+import { type BottomSheetModal } from '@gorhom/bottom-sheet';
 import styled from 'styled-components/native';
 
 import { useTheme } from '@theme';
@@ -40,7 +40,7 @@ const ActivityDetailsUI: FC<Props> = ({
   distanceMeasurementSystem,
   onDeleteActivity,
 }) => {
-  const editActivityBottomSheetRef = useRef<GorohmBottomSheet>(null);
+  const editActivityBottomSheetRef = useRef<BottomSheetModal>(null);
 
   const router = useRouter();
   const theme = useTheme();
@@ -71,7 +71,7 @@ const ActivityDetailsUI: FC<Props> = ({
   }, [activity, router]);
 
   const goToEditActivity = useCallback((): void => {
-    editActivityBottomSheetRef.current?.close();
+    editActivityBottomSheetRef.current?.dismiss();
 
     if (!activity) {
       return;
@@ -81,7 +81,7 @@ const ActivityDetailsUI: FC<Props> = ({
   }, [activity, router]);
 
   const deleteActivity = useCallback((): void => {
-    editActivityBottomSheetRef.current?.close();
+    editActivityBottomSheetRef.current?.dismiss();
 
     if (!activity) {
       return;
@@ -124,7 +124,7 @@ const ActivityDetailsUI: FC<Props> = ({
         locationsError={isActivityLocationsError}
         distanceMeasurementSystem={distanceMeasurementSystem}
         onEdit={() => {
-          editActivityBottomSheetRef.current?.expand();
+          editActivityBottomSheetRef.current?.present();
         }}
         onPressMap={goToZoomableMap}
         onGoBack={goBack}

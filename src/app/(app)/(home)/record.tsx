@@ -36,7 +36,13 @@ const RecordScreen: FC = () => {
     }
 
     const foregroundPermissions = await Location.requestForegroundPermissionsAsync();
-    setHasPermission(foregroundPermissions.granted);
+    if (!foregroundPermissions.granted) {
+      setHasPermission(false);
+      return;
+    }
+
+    const backgroundPermissions = await Location.requestBackgroundPermissionsAsync();
+    setHasPermission(backgroundPermissions.granted);
   }, [activityState]);
 
   const checkPermissionsAndBattery = useCallback(async (): Promise<void> => {
@@ -142,6 +148,8 @@ const RecordScreen: FC = () => {
     if (activityTask.startTimestamp === 0) {
       setActivityState('notStarted');
     }
+    // activityTask.startTimestamp is a non-reactive singleton property; intentionally runs on focus change only
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFocused]);
 
   return (

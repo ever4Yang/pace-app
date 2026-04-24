@@ -107,7 +107,7 @@ const SummaryActivityList: FC<Props> = ({
     });
   }, [activities]);
 
-  const colors = useMemo(() => {
+  const colors = useMemo((): [string, string] => {
     if (theme.dark) {
       return [theme.colors.background, theme.colors.background];
     }

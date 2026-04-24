@@ -59,25 +59,22 @@ const SaveScreen: FC = () => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const defaultName = useMemo(() => {
-    const currentHour = new Date().getHours();
+    const now = new Date();
+    const currentHour = now.getHours();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const dateStr = `${month}-${day}`;
+
     const defaultActivityTypeName = i18n.t(
       `saveActivity.form.activityType.${(activityType || ActivityType.RUNNING).toLowerCase()}`,
     );
 
-    if (currentHour < 12) {
-      return i18n.t('saveActivity.form.defaultName.morning', {
-        activityType: defaultActivityTypeName,
-      });
-    }
-    if (currentHour < 18) {
-      return i18n.t('saveActivity.form.defaultName.afternoon', {
-        activityType: defaultActivityTypeName,
-      });
-    }
-
-    return i18n.t('saveActivity.form.defaultName.evening', {
+    const timeOfDay = currentHour < 12 ? 'morning' : currentHour < 18 ? 'afternoon' : 'evening';
+    const baseName = i18n.t(`saveActivity.form.defaultName.${timeOfDay}`, {
       activityType: defaultActivityTypeName,
     });
+
+    return `${baseName} ${dateStr}`;
   }, [activityType]);
 
   const { handleSubmit, formState, ...formMethods } = useForm<FormData>({

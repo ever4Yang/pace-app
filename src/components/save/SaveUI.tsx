@@ -2,7 +2,7 @@ import React, { type FC, useMemo, useRef, useState } from 'react';
 
 import { StatusBar } from 'expo-status-bar';
 
-import type GorhomBottomSheet from '@gorhom/bottom-sheet';
+import { type BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { getCalories, getPaceInMinutesPerKilometers } from '@activity';
@@ -33,7 +33,7 @@ type Props = {
 };
 
 const SaveUI: FC<Props> = ({ distanceMeasurementSystem, uploading, onSubmit }) => {
-  const activityTypeBottomSheetRef = useRef<GorhomBottomSheet>(null);
+  const activityTypeBottomSheetRef = useRef<BottomSheetModal>(null);
 
   const [snapshotLightReady, setSnapshotLightReady] = useState(false);
   const [snapshotDarkReady, setSnapshotDarkReady] = useState(false);
@@ -114,7 +114,7 @@ const SaveUI: FC<Props> = ({ distanceMeasurementSystem, uploading, onSubmit }) =
         form={{ control, onSubmit, handleSubmit }}
         inputsDisabled={!uploading}
         onEditActivityType={() => {
-          activityTypeBottomSheetRef.current?.expand();
+          activityTypeBottomSheetRef.current?.present();
         }}
       />
       <Controller
@@ -124,7 +124,7 @@ const SaveUI: FC<Props> = ({ distanceMeasurementSystem, uploading, onSubmit }) =
             ref={activityTypeBottomSheetRef}
             onChangeActivityType={(type) => {
               onChange(type);
-              activityTypeBottomSheetRef.current?.close();
+              activityTypeBottomSheetRef.current?.dismiss();
             }}
           />
         )}

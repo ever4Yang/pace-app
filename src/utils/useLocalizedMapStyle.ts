@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 
 type StyleLayer = {
   layout?: Record<string, unknown>;

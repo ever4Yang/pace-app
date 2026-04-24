@@ -3,7 +3,7 @@ import React, { type FC, useCallback, useLayoutEffect } from 'react';
 import { useNavigation, useRouter } from 'expo-router';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, type Resolver, useForm } from 'react-hook-form';
 import { object, string } from 'yup';
 
 import useDeleteProfilePicture from '@api/profilePicture/useDeleteProfilePicture';
@@ -40,7 +40,7 @@ const ChooseProfilePictureScreen: FC = () => {
   } = useUpdateProfilePicture();
 
   const { handleSubmit, formState, ...formMethods } = useForm<FormType>({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as Resolver<FormType>,
     defaultValues: {
       profilePicture: profilePictureData,
     },

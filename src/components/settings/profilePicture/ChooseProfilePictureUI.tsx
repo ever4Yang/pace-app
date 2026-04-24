@@ -1,9 +1,11 @@
 import React, { type FC, useCallback, useRef } from 'react';
 import { Alert, Linking, useWindowDimensions } from 'react-native';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import * as ImagePicker from 'expo-image-picker';
 
-import type GorohmBottomSheet from '@gorhom/bottom-sheet';
+import { type BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Controller, useFormContext } from 'react-hook-form';
 import styled from 'styled-components/native';
 
@@ -22,7 +24,7 @@ const IMAGE_OPTIONS: ImagePicker.ImagePickerOptions = {
   base64: true,
 };
 
-const Wrapper = styled.SafeAreaView`
+const Wrapper = styled(SafeAreaView)`
   flex: 1;
 
   display: flex;
@@ -100,13 +102,13 @@ const ChooseProfilePictureUI: FC<Props> = ({
   onSubmit,
   onDiscard,
 }) => {
-  const editProfilePictureBottomSheetRef = useRef<GorohmBottomSheet>(null);
+  const editProfilePictureBottomSheetRef = useRef<BottomSheetModal>(null);
 
   const { width: windowWidth } = useWindowDimensions();
   const { control, setValue } = useFormContext<FormData>();
 
   const onOpenEditBottomSheet = useCallback(() => {
-    editProfilePictureBottomSheetRef.current?.expand();
+    editProfilePictureBottomSheetRef.current?.present();
   }, []);
 
   const openAlert = useCallback((title: string, body: string): void => {
@@ -121,7 +123,7 @@ const ChooseProfilePictureUI: FC<Props> = ({
   }, []);
 
   const onOpenMediaLibrary = useCallback(async (): Promise<void> => {
-    editProfilePictureBottomSheetRef.current?.close();
+    editProfilePictureBottomSheetRef.current?.dismiss();
 
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -148,7 +150,7 @@ const ChooseProfilePictureUI: FC<Props> = ({
   }, [openAlert, setValue]);
 
   const onOpenCamera = useCallback(async (): Promise<void> => {
-    editProfilePictureBottomSheetRef.current?.close();
+    editProfilePictureBottomSheetRef.current?.dismiss();
 
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
@@ -173,7 +175,7 @@ const ChooseProfilePictureUI: FC<Props> = ({
   }, [openAlert, setValue]);
 
   const onDeleteImage = useCallback((): void => {
-    editProfilePictureBottomSheetRef.current?.close();
+    editProfilePictureBottomSheetRef.current?.dismiss();
     setValue('profilePicture', null, { shouldDirty: true });
   }, [setValue]);
 

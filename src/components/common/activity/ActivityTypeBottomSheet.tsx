@@ -1,11 +1,11 @@
 import React, { forwardRef } from 'react';
 
-import type GorohmBottomSheet from '@gorhom/bottom-sheet';
+import { type BottomSheetModal } from '@gorhom/bottom-sheet';
 
 import { useTheme } from '@theme';
 
 import ActivityIcon from '@components/common/activity/ActivityIcon';
-import { BottomSheet, BottomSheetLabel, BottomSheetMenuEntry } from '@components/ui';
+import { BottomSheetLabel, BottomSheetMenuEntry, ModalBottomSheet } from '@components/ui';
 
 import { ActivityType } from '@models/Activity';
 
@@ -18,12 +18,12 @@ type Props = {
   onChangeActivityType: (type: ActivityType) => void;
 };
 
-const ActivityTypeBottomSheet = forwardRef<GorohmBottomSheet, Props>(
+const ActivityTypeBottomSheet = forwardRef<BottomSheetModal, Props>(
   ({ onChangeActivityType }, ref) => {
     const theme = useTheme();
 
     return (
-      <BottomSheet ref={ref} index={-1} snapPoints={SNAP_POINTS} enablePanDownToClose>
+      <ModalBottomSheet ref={ref} snapPoints={SNAP_POINTS} enablePanDownToClose>
         <BottomSheetMenuEntry
           onPress={() => {
             onChangeActivityType(ActivityType.RUNNING);
@@ -48,7 +48,7 @@ const ActivityTypeBottomSheet = forwardRef<GorohmBottomSheet, Props>(
           />
           <BottomSheetLabel>{i18n.t('activityType.cycling')}</BottomSheetLabel>
         </BottomSheetMenuEntry>
-      </BottomSheet>
+      </ModalBottomSheet>
     );
   },
 );

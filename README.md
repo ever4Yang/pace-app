@@ -59,3 +59,42 @@ npm run android:build
 ```
 
 > The first build downloads Gradle and all dependencies (~10–15 min). Subsequent builds are much faster.
+
+
+## Running on a Windows Android Emulator from WSL2
+
+The WSL2 network is isolated from Windows, so ADB cannot reach the emulator directly.
+
+**1. On Windows** (PowerShell/CMD) — start ADB server listening on all interfaces:
+```cmd
+adb kill-server
+adb -a nodaemon server
+```
+Leave this terminal open.
+
+**2. In WSL** — point ADB at the Windows host:
+```bash
+WINDOWS_IP=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}')
+export ADB_SERVER_SOCKET=tcp:$WINDOWS_IP:5037
+adb devices   # should list the Windows emulator
+```
+
+**3. Reverse the Metro bundler port** so the emulator can reach WSL:
+```bash
+adb reverse tcp:8081 tcp:8081
+```
+
+**4. Start the dev server** normally:
+```bash
+npm run start
+```
+
+To persist the ADB socket across sessions, add to `~/.bashrc` or `~/.zshrc`:
+```bash
+export ADB_SERVER_SOCKET=tcp:$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):5037
+```
+
+If Windows Firewall blocks the connection, run once in an elevated PowerShell:
+```powershell
+New-NetFirewallRule -DisplayName "ADB WSL" -Direction Inbound -Protocol TCP -LocalPort 5037 -Action Allow
+```

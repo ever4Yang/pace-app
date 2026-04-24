@@ -1,6 +1,6 @@
 import React, { type FC, useRef } from 'react';
 
-import type GorhomBottomSheet from '@gorhom/bottom-sheet';
+import { type BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { useTheme } from '@theme';
@@ -25,7 +25,7 @@ type Props = {
 };
 
 const EditActivityUI: FC<Props> = ({ activity, onSubmit }) => {
-  const activityTypeBottomSheetRef = useRef<GorhomBottomSheet>(null);
+  const activityTypeBottomSheetRef = useRef<BottomSheetModal>(null);
 
   const { control, handleSubmit, watch } = useFormContext<FormData>();
   const activityType = watch('type');
@@ -69,7 +69,7 @@ const EditActivityUI: FC<Props> = ({ activity, onSubmit }) => {
         distanceMeasurementSystem={DistanceMeasurementSystem.METRIC}
         form={{ control, handleSubmit, onSubmit }}
         onEditActivityType={() => {
-          activityTypeBottomSheetRef.current?.expand();
+          activityTypeBottomSheetRef.current?.present();
         }}
       />
       <Controller
@@ -79,7 +79,7 @@ const EditActivityUI: FC<Props> = ({ activity, onSubmit }) => {
             ref={activityTypeBottomSheetRef}
             onChangeActivityType={(type) => {
               onChange(type);
-              activityTypeBottomSheetRef.current?.close();
+              activityTypeBottomSheetRef.current?.dismiss();
             }}
           />
         )}

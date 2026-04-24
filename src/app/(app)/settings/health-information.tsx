@@ -1,4 +1,4 @@
-import React, { type FC, useCallback, useLayoutEffect } from 'react';
+import React, { type FC, useCallback, useLayoutEffect, useRef } from 'react';
 
 import { useNavigation, useRouter } from 'expo-router';
 
@@ -49,6 +49,7 @@ const ConfigureHealthInformationScreen: FC = () => {
 
   const router = useRouter();
   const navigation = useNavigation();
+  const isSubmittingRef = useRef(false);
 
   const { handleSubmit, formState, ...formMethods } = useForm<HealthInformation>({
     resolver: yupResolver(schema),
@@ -73,10 +74,11 @@ const ConfigureHealthInformationScreen: FC = () => {
 
   const onSubmitHealthInformation = useCallback(
     (newHealthInformation: HealthInformation): void => {
-      if (isPreferencesLoading || isHealthInformationLoading) {
+      if (isPreferencesLoading || isHealthInformationLoading || isSubmittingRef.current) {
         return;
       }
 
+      isSubmittingRef.current = true;
       reset();
 
       updateHealthInformation({

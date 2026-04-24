@@ -5,7 +5,7 @@ export default {
     name: IS_DEV ? 'PACE (Dev)' : 'PACE',
     description: 'Private Fitness App',
     slug: 'mykeep',
-    scheme: IS_DEV ? 'com.freedy.keep.dev' : 'com.freedy.keep',
+    scheme: IS_DEV ? 'pace-dev' : 'pace',
     splash: {
       image: './assets/images/splash.png',
       backgroundColor: '#000000',
@@ -17,6 +17,8 @@ export default {
       versionCode: 16,
       permissions: [
         'ACCESS_FINE_LOCATION',
+        'ACCESS_BACKGROUND_LOCATION',
+        'RECEIVE_BOOT_COMPLETED',
         'FOREGROUND_SERVICE',
         'FOREGROUND_SERVICE_LOCATION',
       ],
@@ -51,14 +53,38 @@ export default {
       },
     },
     plugins: [
-      'expo-font',
+      [
+        'expo-font',
+        {
+          fonts: [
+            './assets/fonts/roboto/Roboto-Regular.ttf',
+            './assets/fonts/roboto/Roboto-Bold.ttf',
+            './assets/fonts/roboto/Roboto-BlackItalic.ttf',
+          ],
+        },
+      ],
       'expo-router',
+      [
+        'expo-location',
+        {
+          locationAlwaysAndWhenInUsePermission:
+            'Turning on location services allows PACE to record your activities.',
+          isAndroidBackgroundLocationEnabled: true,
+          isAndroidForegroundServiceEnabled: true,
+        },
+      ],
+      'expo-task-manager',
       '@maplibre/maplibre-react-native',
       [
         'expo-build-properties',
         {
-          ios: { newArchitectureEnabled: true },
-          android: { newArchitectureEnabled: true },
+          android: {
+            extraGradleProperties: {
+              'org.gradle.jvmargs':
+                '-Xmx4g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8',
+              'org.gradle.daemon': 'false',
+            },
+          },
         },
       ],
     ],

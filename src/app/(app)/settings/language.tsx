@@ -1,7 +1,5 @@
 import React, { type FC, useCallback } from 'react';
 
-import { useRouter } from 'expo-router';
-
 import Checkbox from 'expo-checkbox';
 
 import styled from 'styled-components/native';
@@ -46,7 +44,6 @@ const LANGUAGES = [
 ];
 
 const LanguageScreen: FC = () => {
-  const router = useRouter();
   const theme = useTheme();
   const { setLocale } = useLocale();
 
@@ -59,9 +56,8 @@ const LanguageScreen: FC = () => {
     (code: string): void => {
       updateLanguage({ language: code });
       setLocale(code);
-      router.back();
     },
-    [updateLanguage, setLocale, router],
+    [updateLanguage, setLocale],
   );
 
   return (

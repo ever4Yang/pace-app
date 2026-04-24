@@ -1,6 +1,7 @@
 export { default as ActivityIndicator } from './ActivityIndicator';
 export {
   default as BottomSheet,
+  ModalBottomSheet,
   Label as BottomSheetLabel,
   MenuEntry as BottomSheetMenuEntry,
 } from './BottomSheet';

@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Simulates a ~1.6km running loop for the Android emulator.
 # Usage: ./scripts/emulator-run-gps.sh [interval_seconds]
-#   interval_seconds: time between GPS points (default: 18)
+#   interval_seconds: time between GPS points (default: 10.5)
 #
-# Simulates running at ~5 km/h around a park loop near
+# Simulates running at 7 min/km (~8.6 km/h) around a park loop near
 # Lianhua Hill Park (莲花山公园), Futian District, Shenzhen, China.
-# Each step is ~25m. At 5 km/h (~1.39 m/s), 25m ≈ 18 seconds per step.
+# Each step is ~25m. At 7 min/km (~2.38 m/s), 25m ≈ 10.5 seconds per step.
 
-INTERVAL=${1:-18}
+INTERVAL=${1:-10.5}
 
 # Rectangular loop: SW corner 114.0550°E 22.5365°N
 # ~500m east–west (20 steps), ~300m north–south (12 steps)

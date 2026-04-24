@@ -1,6 +1,6 @@
 import React, { type FC, useMemo } from 'react';
 
-import { differenceInDays, format, formatRelative } from 'date-fns';
+import { type Locale, differenceInDays, format, formatRelative } from 'date-fns';
 import { enUS, zhCN } from 'date-fns/locale';
 import styled from 'styled-components/native';
 

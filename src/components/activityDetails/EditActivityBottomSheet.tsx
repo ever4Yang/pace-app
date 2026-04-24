@@ -1,12 +1,12 @@
 import React, { forwardRef } from 'react';
 
-import type GorhomBottomSheet from '@gorhom/bottom-sheet';
+import { type BottomSheetModal } from '@gorhom/bottom-sheet';
 import styled from 'styled-components/native';
 
 import { useTheme } from '@theme';
 
 import { EditIcon, TrashIcon } from '@components/icons';
-import { BottomSheet, BottomSheetLabel, BottomSheetMenuEntry } from '@components/ui';
+import { BottomSheetLabel, BottomSheetMenuEntry, ModalBottomSheet } from '@components/ui';
 
 import i18n from '@translations/i18n';
 
@@ -22,12 +22,12 @@ type Props = {
   onDeleteActivity: () => void;
 };
 
-const EditActivityBottomSheet = forwardRef<GorhomBottomSheet, Props>(
+const EditActivityBottomSheet = forwardRef<BottomSheetModal, Props>(
   ({ onEditActivity, onDeleteActivity }, ref) => {
     const theme = useTheme();
 
     return (
-      <BottomSheet ref={ref} index={-1} snapPoints={SNAP_POINTS} enablePanDownToClose>
+      <ModalBottomSheet ref={ref} snapPoints={SNAP_POINTS} enablePanDownToClose>
         <BottomSheetMenuEntry onPress={onEditActivity}>
           <EditIcon width={ICON_SIZE} height={ICON_SIZE} color={theme.colors.primary} />
           <BottomSheetLabel>{i18n.t('activityDetails.bottomSheet.editActivity')}</BottomSheetLabel>
@@ -36,7 +36,7 @@ const EditActivityBottomSheet = forwardRef<GorhomBottomSheet, Props>(
           <TrashIcon width={ICON_SIZE} height={ICON_SIZE} color={theme.colors.red} />
           <DeleteLabel>{i18n.t('activityDetails.bottomSheet.deleteActivity')}</DeleteLabel>
         </BottomSheetMenuEntry>
-      </BottomSheet>
+      </ModalBottomSheet>
     );
   },
 );

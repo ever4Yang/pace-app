@@ -1,6 +1,7 @@
 import React, { type FC, useMemo } from 'react';
 import { ScrollView, type StyleProp, type ViewStyle } from 'react-native';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
 import { useTheme } from '@theme';
@@ -17,7 +18,7 @@ import {
   SportPreferencesButton,
 } from './buttons';
 
-const Wrapper = styled.SafeAreaView`
+const Wrapper = styled(SafeAreaView)`
   flex: 1;
   background-color: ${({ theme }) => theme.colors.background};
 `;
