@@ -3,18 +3,6 @@ import convertPaceInMilesPerHour from './convertPaceInMilesPerHour';
 import convertPaceInMinutesPerKmToKmPerHour from './convertPaceInMinutesPerKmToKmPerHour';
 import convertPaceInMinutesPerMiles from './convertPaceInMinutesPerMiles';
 import convertPaceKmPerHourToMinutesPerKm from './convertPaceKmPerHourToMinutesPerKm';
-import decryptActivity from './decryptActivity';
-import decryptCreationDate from './decryptCreationDate';
-import decryptDefaultActivityType from './decryptDefaultActivityType';
-import decryptLocations from './decryptLocations';
-import decryptMapSnapshot from './decryptMapSnapshot';
-import decryptSummary from './decryptSummary';
-import encryptActivity from './encryptActivity';
-import encryptCreationDate from './encryptCreationDate';
-import encryptDefaultActivityType from './encryptDefaultActivityType';
-import encryptLocations from './encryptLocations';
-import encryptMapSnapshot from './encryptMapSnapshot';
-import encryptSummary from './encryptSummary';
 import {
   formatCalories,
   formatDistance,
@@ -49,8 +37,9 @@ import {
 import type { Histogram as HistogramImported } from './histogram/types';
 import { Split as SplitActivity } from './types';
 import updateSummary from './updateSummary';
-import uploadActivity from './upload';
 import { convertKilogramsToPounds, convertPoundsToKilograms } from './utils';
+import { getUnitLabels } from './useUnitLabels';
+import type { DurationLabels, UnitLabels } from './useUnitLabels';
 
 export {
   buildSummary,
@@ -61,18 +50,6 @@ export {
   convertPaceInMinutesPerMiles,
   convertPaceKmPerHourToMinutesPerKm,
   convertPoundsToKilograms,
-  decryptActivity,
-  decryptCreationDate,
-  decryptDefaultActivityType,
-  decryptLocations,
-  decryptMapSnapshot,
-  decryptSummary,
-  encryptActivity,
-  encryptCreationDate,
-  encryptDefaultActivityType,
-  encryptLocations,
-  encryptMapSnapshot,
-  encryptSummary,
   formatCalories,
   formatDistance,
   formatDuration,
@@ -99,8 +76,9 @@ export {
   searchDistance,
   smoothHistogram,
   updateSummary,
-  uploadActivity,
+  getUnitLabels,
 };
 
 export type Split = SplitActivity;
 export type Histogram = HistogramImported;
+export type { DurationLabels, UnitLabels };

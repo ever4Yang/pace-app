@@ -24,7 +24,6 @@ const CyclingSummary: FC<SummaryProps> = ({
 
   const { data: activityLocationsData } = useActivityLocations({
     activityId: activity.id,
-    activityEncryptionKey: activity.encryptionKey,
   });
 
   const formattedElevation = useMemo(() => {

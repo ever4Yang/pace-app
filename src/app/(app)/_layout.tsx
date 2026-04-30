@@ -1,43 +1,10 @@
 import type { FC } from 'react';
 
-import { Redirect, Stack } from 'expo-router';
-
-import styled from 'styled-components/native';
-
-import { useAuth } from '@auth';
-
-import { ActivityIndicator } from '@components/ui';
+import { Stack } from 'expo-router';
 
 import i18n from '@translations/i18n';
 
-const LoadingWrapper = styled.View`
-  flex: 1;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  background-color: ${({ theme }) => theme.colors.background};
-`;
-
 const AppLayout: FC = () => {
-  const {
-    state: { profileData, loading },
-  } = useAuth();
-
-  if (loading) {
-    return (
-      <LoadingWrapper>
-        <ActivityIndicator size="large" />
-      </LoadingWrapper>
-    );
-  }
-
-  if (!profileData) {
-    return <Redirect href="/auth" />;
-  }
-
   return (
     <Stack>
       <Stack.Screen name="(home)" options={{ headerShown: false }} />
@@ -80,15 +47,9 @@ const AppLayout: FC = () => {
         }}
       />
       <Stack.Screen
-        name="settings/recovery-email"
+        name="settings/language"
         options={{
-          headerTitle: i18n.t('settings.recoveryEmail.screenTitle'),
-        }}
-      />
-      <Stack.Screen
-        name="settings/change-password"
-        options={{
-          headerTitle: i18n.t('settings.changePassword.screenTitle'),
+          headerTitle: i18n.t('settings.buttons.language'),
         }}
       />
       <Stack.Screen

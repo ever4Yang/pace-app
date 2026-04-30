@@ -35,7 +35,6 @@ const ActivityMap: FC<Props> = ({ activity }) => {
 
   const { data, isLoading, isError } = useActivityMapSnapshot({
     activityId: activity.id,
-    activityEncryptionKey: activity.encryptionKey,
     mapSnapshotTheme: theme.dark ? 'dark' : 'light',
   });
 

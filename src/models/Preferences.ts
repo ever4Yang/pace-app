@@ -5,4 +5,5 @@ export type Preferences = {
   id: string;
   measurement: DistanceMeasurementSystem;
   defaultActivityType: ActivityType;
+  language: string;
 };

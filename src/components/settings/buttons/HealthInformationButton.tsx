@@ -41,18 +41,18 @@ const HealthInformationButton: FC = () => {
 
     const ageLabel = `${differenceInYears(
       new Date(),
-      new Date(healthInformationData.healthInformation.birthDate),
+      new Date(healthInformationData.birthDate),
     )} ${i18n.t('settings.configureHealthInformation.yearsOld')}`;
 
     const weightLabel =
       preferencesData?.measurement === DistanceMeasurementSystem.IMPERIAL
         ? `${Math.round(
-            convertKilogramsToPounds(healthInformationData.healthInformation.weight),
+            convertKilogramsToPounds(healthInformationData.weight),
           )} lbs`
-        : `${Math.round(healthInformationData.healthInformation.weight)} kg`;
+        : `${Math.round(healthInformationData.weight)} kg`;
 
     return `${i18n.t(
-      `settings.configureHealthInformation.inputs.gender.${healthInformationData.healthInformation.gender}`,
+      `settings.configureHealthInformation.inputs.gender.${healthInformationData.gender}`,
     )}, ${ageLabel}, ${weightLabel}`;
   }, [healthInformationData, preferencesData?.measurement]);
 

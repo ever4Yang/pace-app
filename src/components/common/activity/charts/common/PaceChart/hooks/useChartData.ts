@@ -8,6 +8,7 @@ import {
   convertPaceKmPerHourToMinutesPerKm,
   getCumulativeDistanceInMeters,
   getSpeedHistogram,
+  getUnitLabels,
   prepareDataHistogram,
   smoothHistogram,
 } from '@activity';
@@ -166,16 +167,17 @@ export default function useChartData({
   );
 
   const distanceTicks = useMemo(() => {
-    const unit = distanceMeasurementSystem === DistanceMeasurementSystem.METRIC ? 'km' : 'mi';
+    const { distance: distUnit } = getUnitLabels(distanceMeasurementSystem);
 
     return xScaleTicks.ticks(4).map((tick) => ({
-      label: `${tick / 1000}${unit}`,
+      label: `${tick / 1000}${distUnit}`,
       x: xScaleTicks(tick),
     }));
   }, [distanceMeasurementSystem, xScaleTicks]);
 
   const elevationTicks = useMemo(() => {
-    const unit = distanceMeasurementSystem === DistanceMeasurementSystem.METRIC ? 'm' : 'ft';
+    const { elevation: elevUnit } = getUnitLabels(distanceMeasurementSystem);
+    const unit = elevUnit;
     const minElevation = Math.round(elevation.min);
     const maxElevation = Math.round(elevation.max);
 

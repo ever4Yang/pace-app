@@ -1,13 +1,9 @@
-import { useCallback } from 'react';
-
 import { type UseQueryResult, useQuery } from '@tanstack/react-query';
+import { useSQLiteContext } from 'expo-sqlite';
 
-import { decryptActivity } from '@activity';
-import { type ProfileData, useAuth } from '@auth';
+import type { Activity } from '@models/Activity';
 
-import type { Activity, EncryptedActivity } from '@models/Activity';
-
-import { API_URL, sendGetRequest } from '@utils/sendRequest';
+import { getAllActivities } from '../../db';
 
 import activitiesKeys from './activitiesKeys';
 
@@ -16,56 +12,14 @@ export type ActivityTimelineData = {
   nextCursor: string | undefined;
 };
 
-export type EncryptedActivityTimelineData = {
-  activities: EncryptedActivity[];
-  nextCursor: string | undefined;
-};
-
 export default function useActivityTimeline<T = Activity[]>(
-  select?: (data: EncryptedActivityTimelineData) => T,
+  select?: (data: Activity[]) => T,
 ): UseQueryResult<T, Error> {
-  const { getAuthToken, getProfileData } = useAuth();
-
-  const applySelect = useCallback(
-    (data: EncryptedActivityTimelineData): T => {
-      if (select) {
-        return select(data);
-      }
-
-      const profileData = getProfileData() as ProfileData;
-      // @ts-ignore
-      return data.activities
-        .map((activity) => {
-          try {
-            return decryptActivity(activity, profileData.keyPairs.encryptionKeyPair);
-          } catch {
-            return null;
-          }
-        })
-        .filter((activity) => activity?.summary)
-        .sort((activity1, activity2) => {
-          if (activity1!.createdAt < activity2!.createdAt) {
-            return 1;
-          }
-          if (activity1!.createdAt > activity2!.createdAt) {
-            return -1;
-          }
-          return 0;
-        });
-    },
-    [getProfileData, select],
-  );
+  const db = useSQLiteContext();
 
   return useQuery({
     queryKey: activitiesKeys.timeline(),
-    queryFn: () => {
-      const authToken = getAuthToken();
-      return sendGetRequest<EncryptedActivityTimelineData>(
-        `${API_URL}/api/activities`,
-        authToken as string,
-      );
-    },
-    select: applySelect,
-    enabled: Boolean(getAuthToken()),
+    queryFn: () => getAllActivities(db),
+    select,
   });
 }

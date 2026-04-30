@@ -36,7 +36,13 @@ const RecordScreen: FC = () => {
     }
 
     const foregroundPermissions = await Location.requestForegroundPermissionsAsync();
-    setHasPermission(foregroundPermissions.granted);
+    if (!foregroundPermissions.granted) {
+      setHasPermission(false);
+      return;
+    }
+
+    const backgroundPermissions = await Location.requestBackgroundPermissionsAsync();
+    setHasPermission(backgroundPermissions.granted);
   }, [activityState]);
 
   const checkPermissionsAndBattery = useCallback(async (): Promise<void> => {
@@ -132,6 +138,19 @@ const RecordScreen: FC = () => {
 
     setActivityType(preferencesData?.defaultActivityType || ActivityType.RUNNING);
   }, [isFetchingPreferences, preferencesData?.defaultActivityType]);
+
+  useEffect(() => {
+    if (!isFocused || activityState === 'notStarted') {
+      return;
+    }
+
+    // If the task was reset externally (e.g. after saving), sync UI state back to idle
+    if (activityTask.startTimestamp === 0) {
+      setActivityState('notStarted');
+    }
+    // activityTask.startTimestamp is a non-reactive singleton property; intentionally runs on focus change only
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFocused]);
 
   return (
     <RecordUI

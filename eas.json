@@ -21,8 +21,7 @@
       "distribution": "internal",
       "channel": "preview",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://api.withpace.io",
-        "EXPO_PUBLIC_WEB_URL": "https://withpace.io"
+       
       },
       "android": {
         "buildType": "apk"
@@ -31,9 +30,8 @@
     "production": {
       "channel": "production",
       "env": {
-        "APP_VARIANT": "production",
-        "EXPO_PUBLIC_API_URL": "https://api.withpace.io",
-        "EXPO_PUBLIC_WEB_URL": "https://withpace.io"
+        "APP_VARIANT": "production"
+      
       }
     }
   },

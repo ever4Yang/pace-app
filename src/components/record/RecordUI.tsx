@@ -4,11 +4,21 @@ import { Platform } from 'react-native';
 import type { LocationObject } from 'expo-location';
 import { useRouter } from 'expo-router';
 
-import type GorohmBottomSheet from '@gorhom/bottom-sheet';
-import MapLibreGL from '@maplibre/maplibre-react-native';
+import { type BottomSheetModal } from '@gorhom/bottom-sheet';
+import {
+  Camera,
+  GeoJSONSource,
+  Layer,
+  Map,
+  type TrackUserLocation,
+  type TrackUserLocationChangeEvent,
+  UserLocation,
+} from '@maplibre/maplibre-react-native';
 import styled from 'styled-components/native';
 
 import { useTheme } from '@theme';
+
+import { useLocale } from '@translations/LocaleProvider';
 
 import ActivityTypeBottomSheet from '@components/common/activity/ActivityTypeBottomSheet';
 
@@ -16,6 +26,8 @@ import { type ActivityTaskState, ActivityType } from '@models/Activity';
 import type { DistanceMeasurementSystem } from '@models/UnitSystem';
 
 import ActivityTask, { ActivityListener } from '@tasks/ActivityTask';
+
+import useLocalizedMapStyle from '@utils/useLocalizedMapStyle';
 
 import { MAPTILER_URL_DARK, MAPTILER_URL_LIGHT } from '../../consts';
 import ActivityRunning from './ActivityRunning';
@@ -33,7 +45,7 @@ const Wrapper = styled.View`
   flex-direction: column;
 `;
 
-const StyledMapView = styled(MapLibreGL.MapView)`
+const StyledMapView = styled(Map)`
   flex: 1;
 
   width: 100%;
@@ -66,23 +78,26 @@ const RecordUI: FC<Props> = ({
   onResumeActivity,
   onStopActivity,
 }) => {
-  const activityTypeBottomSheetRef = useRef<GorohmBottomSheet>(null);
+  const activityTypeBottomSheetRef = useRef<BottomSheetModal>(null);
 
   const [batteryOptimizationModalOpen, setBatteryOptimizationModalOpen] =
     useState(hasBatteryOptimization);
   const [mapReady, setMapReady] = useState(Platform.OS === 'ios');
   const [coordinates, setCoordinates] = useState<number[][]>([]);
-  const [followUserLocation, setFollowUserLocation] = useState(true);
-  const [userFollowMode, setUserFollowMode] = useState<MapLibreGL.UserTrackingMode | null>(
-    MapLibreGL.UserTrackingMode.FollowWithCourse,
+  const [trackUserLocation, setTrackUserLocation] = useState<TrackUserLocation | undefined>(
+    'course',
   );
 
   const router = useRouter();
   const theme = useTheme();
+  const { locale } = useLocale();
+  const styleURL = useLocalizedMapStyle(
+    theme.dark ? MAPTILER_URL_DARK : MAPTILER_URL_LIGHT,
+    locale,
+  );
 
   const onRecenterMap = useCallback((): void => {
-    setFollowUserLocation(true);
-    setUserFollowMode(MapLibreGL.UserTrackingMode.FollowWithCourse);
+    setTrackUserLocation('course');
   }, []);
 
   const onMapFullyRendered = useCallback((): void => {
@@ -90,12 +105,13 @@ const RecordUI: FC<Props> = ({
     onRecenterMap();
   }, [onRecenterMap]);
 
-  const onUserTrackingModeChange: MapLibreGL.Camera['props']['onUserTrackingModeChange'] = (
-    event,
-  ): void => {
-    setUserFollowMode(event.nativeEvent.payload.followUserMode);
-    setFollowUserLocation(event.nativeEvent.payload.followUserLocation);
-  };
+  const onTrackUserLocationChange = useCallback(
+    (event: { nativeEvent: TrackUserLocationChangeEvent }): void => {
+      const mode = event.nativeEvent.trackUserLocation ?? undefined;
+      setTrackUserLocation(mode);
+    },
+    [],
+  );
 
   const onNewLocations: ActivityListener = useCallback((locations: LocationObject[]): void => {
     const newCoordinates = locations.map(({ coords: { latitude, longitude } }) => [
@@ -107,9 +123,8 @@ const RecordUI: FC<Props> = ({
 
   const startActivity = useCallback((): void => {
     setCoordinates([]);
-    ActivityTask.getInstance().addListener(onNewLocations);
     onStartActivity();
-  }, [onNewLocations, onStartActivity]);
+  }, [onStartActivity]);
 
   const stopActivity = useCallback((): void => {
     ActivityTask.getInstance().removeListener(onNewLocations);
@@ -152,40 +167,37 @@ const RecordUI: FC<Props> = ({
     <>
       <Wrapper>
         <StyledMapView
-          styleURL={theme.dark ? MAPTILER_URL_DARK : MAPTILER_URL_LIGHT}
-          logoEnabled={false}
-          attributionEnabled
+          mapStyle={styleURL}
+          logo={false}
+          attribution
           attributionPosition={{ bottom: 8, right: 8 }}
           onDidFinishRenderingMapFully={onMapFullyRendered}>
-          {mapReady && <MapLibreGL.UserLocation showsUserHeadingIndicator />}
-          <MapLibreGL.Camera
-            followUserMode={userFollowMode ?? undefined}
-            zoomLevel={18}
-            followZoomLevel={18}
-            followUserLocation={followUserLocation}
-            onUserTrackingModeChange={onUserTrackingModeChange}
-            animationDuration={0}
+          {mapReady && <UserLocation heading />}
+          <Camera
+            trackUserLocation={trackUserLocation}
+            zoom={18}
+            duration={0}
+            onTrackUserLocationChange={onTrackUserLocationChange}
           />
-          {coordinates.length > 1 && (
-            <>
-              <MapLibreGL.ShapeSource
-                id="activityCoordinates"
-                shape={{
-                  type: 'FeatureCollection',
-                  features: [
-                    {
-                      type: 'Feature',
-                      properties: {},
-                      geometry: { type: 'LineString', coordinates },
-                    },
-                  ],
-                }}>
-                <MapLibreGL.LineLayer
-                  id="locations"
-                  style={{ lineColor: theme.colors.purple, lineWidth: 5 }}
-                />
-              </MapLibreGL.ShapeSource>
-            </>
+          {mapReady && coordinates.length > 1 && (
+            <GeoJSONSource
+              id="activityCoordinates"
+              data={{
+                type: 'FeatureCollection',
+                features: [
+                  {
+                    type: 'Feature',
+                    properties: {},
+                    geometry: { type: 'LineString', coordinates },
+                  },
+                ],
+              }}>
+              <Layer
+                type="line"
+                id="locations"
+                style={{ lineColor: theme.colors.purple, lineWidth: 5 }}
+              />
+            </GeoJSONSource>
           )}
         </StyledMapView>
         <RecenterMapButton onPress={onRecenterMap} />
@@ -196,7 +208,7 @@ const RecordUI: FC<Props> = ({
             distanceMeasurementSystem={distanceMeasurementSystem}
             onStartActivity={startActivity}
             onOpenActivityTypeSheet={() => {
-              activityTypeBottomSheetRef.current?.expand();
+              activityTypeBottomSheetRef.current?.present();
             }}
           />
         )}
@@ -215,7 +227,7 @@ const RecordUI: FC<Props> = ({
         ref={activityTypeBottomSheetRef}
         onChangeActivityType={(type) => {
           onChangeActivityType(type);
-          activityTypeBottomSheetRef.current?.close();
+          activityTypeBottomSheetRef.current?.dismiss();
         }}
       />
       <BatteryModeWarningModal

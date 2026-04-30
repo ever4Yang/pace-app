@@ -52,7 +52,6 @@ const ActivityRunning: FC<Props> = ({
   }, []);
 
   const startStopWatch = useCallback((): void => {
-    // @ts-expect-error
     activityTask.stopWatchId = setInterval(() => {
       updateStopWatch();
     }, STOP_WATCH_REFRESH_INTERVAL_MS);

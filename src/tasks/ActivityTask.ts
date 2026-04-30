@@ -143,7 +143,7 @@ export default class Activity {
   }
 }
 
-TaskManager.defineTask(RECORD_ACTIVITY_TASK_NAME, ({ data, error }) => {
+TaskManager.defineTask(RECORD_ACTIVITY_TASK_NAME, async ({ data, error }) => {
   if (!data || error) {
     return;
   }

@@ -1,6 +1,7 @@
 import React, { type FC, useMemo } from 'react';
 import { ScrollView, type StyleProp, type ViewStyle } from 'react-native';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
 import { useTheme } from '@theme';
@@ -11,29 +12,15 @@ import i18n from '@translations/i18n';
 
 import { version } from '../../../package.json';
 import {
-  ChangePasswordButton,
-  DeleteAccountButton,
   DisplayPreferencesButton,
   HealthInformationButton,
-  RecoveryEmailButton,
-  SignOutButton,
+  LanguageButton,
   SportPreferencesButton,
 } from './buttons';
 
-const Wrapper = styled.SafeAreaView`
+const Wrapper = styled(SafeAreaView)`
   flex: 1;
   background-color: ${({ theme }) => theme.colors.background};
-`;
-
-const Separator = styled.View`
-  width: 100%;
-
-  border-bottom-width: 1px;
-  border-style: solid;
-  border-color: ${({ theme }) => theme.colors.separatorColor};
-
-  margin-top: ${({ theme }) => theme.sizes.outerPadding}px;
-  margin-bottom: ${({ theme }) => theme.sizes.outerPadding}px;
 `;
 
 const Version = styled(Text)`
@@ -43,11 +30,7 @@ const Version = styled(Text)`
   color: ${({ theme }) => theme.colors.secondary};
 `;
 
-type Props = {
-  onDeleteAccount: () => void;
-};
-
-const SettingsUI: FC<Props> = ({ onDeleteAccount }) => {
+const SettingsUI: FC = () => {
   const theme = useTheme();
 
   const scrollViewContainerStyle: StyleProp<ViewStyle> = useMemo(
@@ -68,13 +51,7 @@ const SettingsUI: FC<Props> = ({ onDeleteAccount }) => {
         <DisplayPreferencesButton />
         <HealthInformationButton />
         <SportPreferencesButton />
-        <Separator />
-        <RecoveryEmailButton />
-        <ChangePasswordButton />
-        <Separator />
-        <DeleteAccountButton onDeleteAccount={onDeleteAccount} />
-        <Separator />
-        <SignOutButton />
+        <LanguageButton />
       </ScrollView>
       <Version>{i18n.t('settings.version', { version })}</Version>
     </Wrapper>

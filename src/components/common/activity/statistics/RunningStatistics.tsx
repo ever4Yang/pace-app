@@ -9,6 +9,7 @@ import {
   formatPace,
   getElevationGainInMeters,
   getMovingDurationInSeconds,
+  getUnitLabels,
 } from '@activity';
 
 import { DistanceMeasurementSystem } from '@models/UnitSystem';
@@ -32,20 +33,29 @@ const RunningStatistics: FC<ActivityStatisticsProps> = ({
 }) => {
   const { distance, duration, pace, calories } = summary;
 
-  const formattedDistance = useMemo(
-    () => formatDistance(distance, distanceMeasurementSystem),
-    [distance, distanceMeasurementSystem],
+  const unitLabels = useMemo(
+    () => getUnitLabels(distanceMeasurementSystem),
+    [distanceMeasurementSystem],
   );
 
-  const formattedDuration = useMemo(() => formatDuration(duration), [duration]);
+  const formattedDistance = useMemo(
+    () => formatDistance(distance, distanceMeasurementSystem, undefined, unitLabels.distance),
+    [distance, distanceMeasurementSystem, unitLabels.distance],
+  );
+
+  const formattedDuration = useMemo(() => {
+    const { h, min, sec } = unitLabels.durationLabels;
+    return formatDuration(duration, undefined, h, min, sec);
+  }, [duration, unitLabels.durationLabels]);
 
   const formattedMovingDuration = useMemo(() => {
     if (!locations || locations.length === 0 || locations[0].segment === undefined) {
       return formattedDuration;
     }
 
-    return formatDuration(getMovingDurationInSeconds(locations));
-  }, [formattedDuration, locations]);
+    const { h, min, sec } = unitLabels.durationLabels;
+    return formatDuration(getMovingDurationInSeconds(locations), undefined, h, min, sec);
+  }, [formattedDuration, locations, unitLabels.durationLabels]);
 
   const formattedElevation = useMemo(() => {
     if (!locations) {
@@ -53,24 +63,24 @@ const RunningStatistics: FC<ActivityStatisticsProps> = ({
     }
 
     const elevation = getElevationGainInMeters(locations);
-    return formatElevation(elevation, distanceMeasurementSystem);
-  }, [distanceMeasurementSystem, locations]);
+    return formatElevation(elevation, distanceMeasurementSystem, undefined, unitLabels.elevation);
+  }, [distanceMeasurementSystem, locations, unitLabels.elevation]);
 
   const formattedPace = useMemo(() => {
     const p =
       distanceMeasurementSystem === DistanceMeasurementSystem.METRIC
         ? pace
         : convertPaceInMinutesPerMiles(pace);
-    return formatPace(p, distanceMeasurementSystem);
-  }, [pace, distanceMeasurementSystem]);
+    return formatPace(p, distanceMeasurementSystem, undefined, unitLabels.pace);
+  }, [pace, distanceMeasurementSystem, unitLabels.pace]);
 
   const formattedCalories = useMemo(() => {
     if (!calories) {
       return null;
     }
 
-    return formatCalories(calories);
-  }, [calories]);
+    return formatCalories(calories, unitLabels.calories);
+  }, [calories, unitLabels.calories]);
 
   return (
     <Wrapper>
