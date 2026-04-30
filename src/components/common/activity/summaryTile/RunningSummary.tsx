@@ -1,6 +1,6 @@
 import React, { type FC, useMemo } from 'react';
 
-import { convertPaceInMinutesPerMiles, formatPace } from '@activity';
+import { convertPaceInMinutesPerMiles, formatPace, getUnitLabels } from '@activity';
 import { useTheme } from '@theme';
 
 import { RunningIcon } from '@components/icons';
@@ -30,7 +30,8 @@ const RunningSummary: FC<SummaryProps> = ({
         ? activityPace
         : convertPaceInMinutesPerMiles(activityPace);
 
-    return formatPace(pace, distanceMeasurementSystem);
+    const { pace: paceUnit } = getUnitLabels(distanceMeasurementSystem);
+    return formatPace(pace, distanceMeasurementSystem, undefined, paceUnit);
   }, [activity.summary, distanceMeasurementSystem]);
 
   return (

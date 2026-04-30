@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This App Is
 
-PACE is a React Native / Expo fitness tracking app with **end-to-end encryption** as its central design constraint. The server stores only ciphertext — all encryption and decryption happens on-device.
+PACE is a React Native / Expo fitness tracking app. All data is stored **locally on-device** using SQLite — there is no server, no account, and no sign-up required.
 
 ## Commands
 
@@ -28,40 +28,36 @@ CI runs `check:types` then `lint` on every PR and push to `main`.
 ## Environment Variables
 
 Copy `.env.example` to `.env`. Required variables:
-- `EXPO_PUBLIC_API_URL` — backend API base URL
-- `EXPO_PUBLIC_WEB_URL` — web URL
 - `EXPO_PUBLIC_MAPTILER_API_KEY` — MapTiler API key for map tiles
-- `EXPO_PUBLIC_REVENUE_CAT_API_KEY_ANDROID` / `_IOS` — RevenueCat subscription keys
-- `EXPO_PUBLIC_NUMBER_FREE_ACTIVITIES` — free tier activity limit (prod = 10)
 
 ## Architecture
 
 ### Routing (`src/app/`)
-Expo Router file-system routing. `_layout.tsx` is the root layout that wraps everything in providers (ThemeProvider, AuthProvider, QueryClientProvider). Route groups: `(app)/` for authenticated screens, `auth/` for sign-in/sign-up.
+Expo Router file-system routing. `_layout.tsx` is the root layout that wraps everything in providers (ThemeProvider, QueryClientProvider, DatabaseProvider, LocaleProvider). Route groups: `(app)/` for main screens, `(home)/` for the home screen.
 
 ### Auth Layer (`src/auth/`)
-Context + reducer pattern. Implements **SRP-6a** (Secure Remote Password) — the server never sees the user's password. On signup, passwords are stretched with Argon2id (32 MB memory), then HKDF derives the authentication token. The derived session key decrypts an auth token returned by the server.
+Stub context only — `AuthContext` provides a static username and creation date. There is no sign-up, sign-in, or remote authentication.
 
-### Crypto Layer (`src/crypto/`)
-Generates NaCl box (X25519) keypairs for encryption and Ed25519 keypairs for signing via `react-native-nacl-jsi`. Keys are generated on signup and stored in secure storage.
-
-### Activity Layer (`src/activity/`)
-Pure business logic — encrypt/decrypt activities, locations, map snapshots, health info. Also computes distance, pace, elevation, splits, calories, and histograms. Each activity's encryption key is itself asymmetrically encrypted with the user's NaCl box keypair.
+### Data Layer (`src/db/`)
+`expo-sqlite` for all persistent storage. Repositories handle CRUD for activities, locations, health information, preferences, and profile pictures. `migrations.ts` manages schema upgrades. `DatabaseProvider` exposes the database via React context.
 
 ### API Layer (`src/api/`)
-TanStack Query hooks organized by domain (`activity/`, `account/`, `auth/`). Auth token is passed as `X-Auth-Token` header. HTTP goes through `src/utils/sendRequest.ts` which uses native `fetch`. 401 errors from the QueryCache trigger a "logged out" modal.
+TanStack Query hooks organised by domain (`activity/`, `preferences/`, `healthInformation/`, `profilePicture/`). Hooks read from and write to the local SQLite database — there are no HTTP requests.
+
+### Activity Layer (`src/activity/`)
+Pure business logic — computes distance, pace, elevation, splits, calories, and histograms. Map snapshots are written to `expo-file-system` (`documentDirectory/maps/`).
 
 ### Data Persistence
-TanStack Query with `staleTime: Infinity` + `gcTime: Infinity`, persisted to MMKV via `@tanstack/query-sync-storage-persister`. This makes the app **offline-first** — data is cached indefinitely and synced when connectivity resumes (`@react-native-community/netinfo` + `onlineManager`).
+TanStack Query with `staleTime: Infinity` + `gcTime: Infinity` for in-memory caching on top of SQLite. The source of truth is always the local database.
 
 ### Background GPS (`src/tasks/ActivityTask.ts`)
 Singleton class wrapping `expo-task-manager` + `expo-location` for background GPS recording (foreground service on Android). Uses a listener pattern to push locations to UI components.
 
-### Subscriptions (`src/subscription/`)
-RevenueCat (`react-native-purchases`) with entitlement IDs `pro` and `pro-yearly`. Free tier limit is controlled by `EXPO_PUBLIC_NUMBER_FREE_ACTIVITIES`.
-
 ### UI & Styling (`src/components/`, `src/theme/`)
-`styled-components/native` v6 with a typed theme (light/dark). Theme is declared via `src/theme/styled.d.ts` declaration merging into `DefaultTheme`. Purple `#A749FF` is the primary brand color. Charts use `@shopify/react-native-skia` + D3 (scale/shape).
+`styled-components/native` v6 with a typed theme (light/dark). Theme is declared via `src/theme/styled.d.ts` declaration merging into `DefaultTheme`. Purple `#A749FF` is the primary brand colour. Charts use `@shopify/react-native-skia` + D3 (scale/shape).
+
+### Map Language (`src/utils/useLocalizedMapStyle.ts`)
+`useLocalizedMapStyle(baseUrl, locale)` fetches the MapTiler style JSON, rewrites all `text-field` expressions to use the localised OSM name field (`name:zh`, etc.) with a fallback to `name`, and writes the result to `expo-file-system` cache. MapTiler's `&language=` URL parameter does not work reliably for the `topo` and `dataviz-dark` styles.
 
 ## Path Aliases
 
@@ -73,18 +69,16 @@ Both `tsconfig.json` and `babel.config.js` define these aliases rooted at `./src
 | `@api/*` | `src/api/` |
 | `@auth` | `src/auth/` |
 | `@components/*` | `src/components/` |
-| `@crypto` | `src/crypto/` |
 | `@models/*` | `src/models/` |
 | `@theme` | `src/theme/` |
 | `@translations/*` | `src/translations/` |
 | `@utils/*` | `src/utils/` |
 | `@tasks/*` | `src/tasks/` |
-| `@subscription/*` | `src/subscription/` |
 
 ## Key Patterns
 
 - **TypeScript strict mode** is enabled. New code must satisfy type checking (`npm run check:types`).
-- **Yup schemas** in `src/models/` validate data at system boundaries (form inputs, API responses).
-- **Translations**: All user-facing strings go through `i18n-js` with English locale files in `src/translations/en/`.
+- **Yup schemas** in `src/models/` validate data at system boundaries (form inputs).
+- **Translations**: All user-facing strings go through `i18n-js` with locale files in `src/translations/en/` (English) and `src/translations/zh/` (Chinese). `LocaleProvider` reads the saved language from SQLite on startup.
 - **`patch-package`**: A patch exists for `@maplibre/maplibre-react-native`. Run `npm install` after changing dependencies (postinstall applies patches automatically).
 - **New Architecture** is enabled (see `app.config.js`). Avoid patterns incompatible with the React Native New Architecture (Fabric / JSI).

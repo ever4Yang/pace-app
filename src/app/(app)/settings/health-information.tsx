@@ -1,4 +1,4 @@
-import React, { type FC, useCallback, useLayoutEffect } from 'react';
+import React, { type FC, useCallback, useLayoutEffect, useRef } from 'react';
 
 import { useNavigation, useRouter } from 'expo-router';
 
@@ -49,16 +49,17 @@ const ConfigureHealthInformationScreen: FC = () => {
 
   const router = useRouter();
   const navigation = useNavigation();
+  const isSubmittingRef = useRef(false);
 
   const { handleSubmit, formState, ...formMethods } = useForm<HealthInformation>({
     resolver: yupResolver(schema),
     defaultValues: {
-      gender: healthInformationData?.healthInformation.gender,
-      birthDate: healthInformationData?.healthInformation.birthDate,
+      gender: healthInformationData?.gender,
+      birthDate: healthInformationData?.birthDate,
       weight:
         preferencesData?.measurement === DistanceMeasurementSystem.IMPERIAL && healthInformationData
-          ? Math.round(convertKilogramsToPounds(healthInformationData?.healthInformation.weight))
-          : Math.round(healthInformationData?.healthInformation.weight || 0),
+          ? Math.round(convertKilogramsToPounds(healthInformationData.weight))
+          : Math.round(healthInformationData?.weight || 0),
     },
   });
 
@@ -73,15 +74,15 @@ const ConfigureHealthInformationScreen: FC = () => {
 
   const onSubmitHealthInformation = useCallback(
     (newHealthInformation: HealthInformation): void => {
-      if (isPreferencesLoading || isHealthInformationLoading) {
+      if (isPreferencesLoading || isHealthInformationLoading || isSubmittingRef.current) {
         return;
       }
 
+      isSubmittingRef.current = true;
       reset();
 
       updateHealthInformation({
         healthInformation: newHealthInformation,
-        encryptionKey: healthInformationData?.encryptionKey,
         preferences: preferencesData,
       });
 
@@ -89,7 +90,6 @@ const ConfigureHealthInformationScreen: FC = () => {
     },
     [
       goToSettingsScreen,
-      healthInformationData,
       preferencesData,
       reset,
       updateHealthInformation,

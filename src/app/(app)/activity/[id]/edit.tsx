@@ -67,18 +67,17 @@ const EditActivityScreen: FC = () => {
         name.trim(),
         type,
         activity.summary as ActivitySummary,
-        healthInformationData?.healthInformation!,
+        healthInformationData!,
       );
 
       updateActivity({
         activityId: activity.id,
         summary: updatedSummary,
-        activityEncryptionKey: activity.encryptionKey,
       });
 
       router.back();
     },
-    [activity, healthInformationData?.healthInformation, reset, router, updateActivity],
+    [activity, healthInformationData, reset, router, updateActivity],
   );
 
   useLayoutEffect(() => {

@@ -1,5 +1,6 @@
 {
   "extends": "expo/tsconfig.base",
+  "exclude": ["node_modules/@maplibre", "node_modules/@turf"],
   "compilerOptions": {
     "strict": true,
     "skipLibCheck": true /* Skip type checking all .d.ts files. */,
@@ -13,7 +14,6 @@
       "@crypto": ["crypto"],
       "@models/*": ["models/*"],
       "@navigation/*": ["navigation/*"],
-      "@subscription/*": ["subscription/*"],
       "@screens/*": ["screens/*"],
       "@tasks/*": ["tasks/*"],
       "@theme": ["theme"],

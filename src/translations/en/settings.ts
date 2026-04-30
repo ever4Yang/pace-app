@@ -2,7 +2,6 @@ export default {
   screenTitle: 'Settings',
   version: 'Version {{version}}',
   saving: 'Saving…',
-  signingOut: 'Signing out…',
   chooseProfilePicture: {
     screenTitle: 'Profile picture',
     edit: 'Edit',
@@ -29,11 +28,11 @@ export default {
     },
     alert: {
       cameraPermissions: {
-        title: '“PACE" cannot access the camera.',
+        title: '"PACE" cannot access the camera.',
         body: 'The camera permissions can be configured in Settings',
       },
       photoPermissions: {
-        title: '“PACE" cannot access the photos.',
+        title: '"PACE" cannot access the photos.',
         body: 'The photos permissions can be configured in Settings.',
       },
       buttons: {
@@ -139,103 +138,10 @@ export default {
       },
     },
   },
-  manageSubscription: {
-    freeTrial: 'Free plan',
-    monthlySubscription: 'Monthly subscription',
-    yearlySubscription: 'Yearly subscription',
-  },
-  changePassword: {
-    screenTitle: 'Change password',
-    label: 'Password',
-    inputs: {
-      oldPassword: {
-        placeholder: 'Old password',
-        error: 'Old password is required',
-      },
-      newPassword: {
-        placeholder: 'New password',
-        error: 'New password is required',
-      },
-      confirmNewPassword: {
-        placeholder: 'Confirm new password',
-        notMatching: 'Passwords do not match',
-        error: 'You must confirm the new password',
-      },
-      passwordStrength: {
-        tooWeak: 'Password is too weak.',
-        error: 'Password strength is missing',
-      },
-    },
-    savingModal: {
-      title: 'Saving your password…',
-      failedAuthError: 'Failed to authenticate. Your old password is incorrect.',
-      error: 'An error occurred while saving your password.',
-      buttons: {
-        retry: 'Retry',
-        discard: 'Discard',
-      },
-    },
-  },
-  recoveryEmail: {
-    screenTitle: 'Configure email',
-    label: 'Recovery email',
-    configuredLabel: 'Configured at',
-    notConfigured: 'Not configured',
-    verified: 'Verified',
-    notVerified: 'Not verified',
-    inputPlaceholder: 'Recovery email address',
-  },
-  resendVerificationEmailStatus: {
-    sending: 'Sending the verification email.',
-    success: 'Verification email sent!',
-    failure: 'Failed to send the verification email.',
-  },
-  restorePurchases: {
-    failure: 'Failed to restore purchases.',
-  },
-  deleteAccount: {
-    requiredActionModal: {
-      title: 'Action required',
-      explanation:
-        'You must cancel your subscription on the {{store}} before deleting your account.',
-      buttons: {
-        close: 'Close',
-      },
-    },
-    confirmModal: {
-      title: 'Are you sure you want to delete your account?',
-      explanation: 'All your data and activities will be permanently deleted.',
-      buttons: {
-        confirm: 'Yes, delete my account',
-        cancel: 'Cancel',
-      },
-    },
-    deletingModal: {
-      title: 'Deleting your account…',
-      hasError: {
-        title: 'An error occurred while deleting your account.',
-        explanation: 'Try again later or contact support at hello@withpace.io',
-        buttons: {
-          close: 'Close',
-        },
-      },
-    },
-  },
   buttons: {
     displayPreferences: 'Display preferences',
     healthInformation: 'Health information',
     defaultActivityType: 'Default activity type',
-    manageSubscription: 'Manage subscription',
-    restorePurchases: 'Restore purchases',
-    deleteAccount: 'Delete account',
-    configureRecoveryEmail: 'Configure',
-    saveRecoveryEmail: 'Save',
-    resendVerification: 'Resend the verification email',
-    changePassword: 'Change password',
-    signOut: 'Sign out',
-  },
-  errors: {
-    failureMessage: 'An error occurred…',
-    retry: 'Please, retry to save your email.',
+    language: 'Language',
   },
 };

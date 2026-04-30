@@ -1,6 +1,6 @@
 import React, { type FC, useRef } from 'react';
 
-import MapLibreGL from '@maplibre/maplibre-react-native';
+import { type MapRef } from '@maplibre/maplibre-react-native';
 import styled from 'styled-components/native';
 
 import ActivityMap from '@components/common/activity/ActivityMap';
@@ -34,10 +34,10 @@ export type Props = {
 };
 
 const SnapshotMap: FC<Props> = ({ tileUrl, locations, onMapSnapshot, hideIndicator }) => {
-  const mapRef = useRef<MapLibreGL.MapView | null>(null);
+  const mapRef = useRef<MapRef | null>(null);
 
   const takeSnapshot = async (): Promise<void> => {
-    const uri = await mapRef.current?.takeSnap(false);
+    const uri = await mapRef.current?.createStaticMapImage({ output: 'file' });
     onMapSnapshot(uri ?? '');
   };
 

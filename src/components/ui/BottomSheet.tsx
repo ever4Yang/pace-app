@@ -3,7 +3,10 @@ import React, { forwardRef, useCallback } from 'react';
 import GorhomBottomSheet, {
   BottomSheetBackdrop,
   type BottomSheetBackdropProps,
+  type BottomSheetModalProps,
   type BottomSheetProps,
+  BottomSheetView,
+  BottomSheetModal as GorhomBottomSheetModal,
 } from '@gorhom/bottom-sheet';
 import styled from 'styled-components/native';
 
@@ -16,7 +19,7 @@ const StyledBottomSheet = styled(GorhomBottomSheet)`
   border-top-right-radius: 15px;
 `;
 
-const ContentWrapper = styled.View`
+const ContentWrapper = styled(BottomSheetView)`
   background-color: ${({ theme }) => theme.colors.background};
 `;
 
@@ -62,12 +65,47 @@ const BottomSheet = forwardRef<GorhomBottomSheet, Props>(
         backgroundStyle={{ backgroundColor: theme.colors.background }}
         backdropComponent={renderBackdrop}
         {...props}>
-        <ContentWrapper>{typeof children === 'function' ? children() : children}</ContentWrapper>
+        <ContentWrapper>{children}</ContentWrapper>
       </StyledBottomSheet>
     );
   },
 );
 
 BottomSheet.displayName = 'BottomSheet';
+
+type ModalProps = Omit<BottomSheetModalProps, 'children'> & {
+  hideBackdrop?: boolean;
+  children?: React.ReactNode;
+};
+
+export const ModalBottomSheet = forwardRef<GorhomBottomSheetModal, ModalProps>(
+  ({ hideBackdrop, children, ...props }, ref) => {
+    const theme = useTheme();
+
+    const renderBackdrop = useCallback(
+      (backdropProps: BottomSheetBackdropProps) => {
+        if (hideBackdrop) {
+          return null;
+        }
+
+        return <BottomSheetBackdrop {...backdropProps} appearsOnIndex={0} disappearsOnIndex={-1} />;
+      },
+      [hideBackdrop],
+    );
+
+    return (
+      <GorhomBottomSheetModal
+        ref={ref}
+        handleIndicatorStyle={{ backgroundColor: theme.colors.primary }}
+        backgroundStyle={{ backgroundColor: theme.colors.background }}
+        backdropComponent={renderBackdrop}
+        {...props}>
+        <ContentWrapper>{children}</ContentWrapper>
+      </GorhomBottomSheetModal>
+    );
+  },
+);
+
+ModalBottomSheet.displayName = 'ModalBottomSheet';
 
 export default BottomSheet;

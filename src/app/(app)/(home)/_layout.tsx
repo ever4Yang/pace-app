@@ -54,7 +54,7 @@ const HomeLayout: FC = () => {
           }
         },
       })}>
-      <Tabs.Screen name="index" options={{ headerShown: true, headerTitle: Header }} />
+      <Tabs.Screen name="index" options={{ headerShown: true, headerTitle: () => <Header /> }} />
       <Tabs.Screen
         name="record"
         options={{

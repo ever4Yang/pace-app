@@ -1,12 +1,10 @@
 import { type UseMutationResult, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSQLiteContext } from 'expo-sqlite';
 
-import { encryptMeasurement, useAuth } from '@auth';
-
-import type { PreferencesData } from '@api/preferences/usePreferences';
-
+import type { Preferences } from '@models/Preferences';
 import type { DistanceMeasurementSystem } from '@models/UnitSystem';
 
-import { API_URL, sendPatchRequest } from '@utils/sendRequest';
+import { upsertPreferences } from '../../db';
 
 import preferencesKeys from './preferencesKeys';
 
@@ -14,69 +12,36 @@ type Args = {
   measurement: DistanceMeasurementSystem;
 };
 
-export function useMutationFn(): (args: Args) => Promise<{ message: string }> {
-  const { getProfileData, getAuthToken } = useAuth();
-
-  return ({ measurement }: Args) => {
-    const profileData = getProfileData();
-    if (profileData === null) {
-      throw new Error('Profile data is null');
-    }
-
-    const encryptedMeasurement = encryptMeasurement(
-      measurement,
-      profileData.keyPairs.encryptionKeyPair,
-    );
-
-    const authToken = getAuthToken();
-    return sendPatchRequest<{ message: string }>(
-      `${API_URL}/api/preferences`,
-      authToken as string,
-      {
-        measurement: encryptedMeasurement,
-      },
-    );
-  };
-}
-
 export default function useUpdateDisplayPreferences(): UseMutationResult<
-  { message: string },
+  void,
   unknown,
   Args,
   unknown
 > {
+  const db = useSQLiteContext();
   const queryClient = useQueryClient();
-  const mutationFn = useMutationFn();
-  const { getProfileData } = useAuth();
 
   return useMutation({
     mutationKey: preferencesKeys.updateDisplayPreferences(),
-    mutationFn,
+    mutationFn: ({ measurement }: Args) => {
+      upsertPreferences(db, { measurement });
+      return Promise.resolve();
+    },
     onMutate: async ({ measurement }) => {
       await queryClient.cancelQueries({ queryKey: preferencesKeys.details() });
-      const previousPreferences = queryClient.getQueryData<PreferencesData>(
-        preferencesKeys.details(),
-      );
+      const previousPreferences = queryClient.getQueryData<Preferences>(preferencesKeys.details());
 
-      const profileData = getProfileData();
-      if (!profileData || !previousPreferences) {
-        return { previousPreferences };
+      if (previousPreferences) {
+        queryClient.setQueryData(preferencesKeys.details(), {
+          ...previousPreferences,
+          measurement,
+        });
       }
-
-      const newPreferences: PreferencesData = {
-        ...previousPreferences,
-        measurement: encryptMeasurement(measurement, profileData.keyPairs.encryptionKeyPair),
-      };
-
-      queryClient.setQueryData(preferencesKeys.details(), newPreferences);
 
       return { previousPreferences };
     },
     onError: (_, __, context) => {
-      if (!context) {
-        return;
-      }
-
+      if (!context) return;
       queryClient.setQueryData(preferencesKeys.details(), context.previousPreferences);
     },
     onSettled: () => {

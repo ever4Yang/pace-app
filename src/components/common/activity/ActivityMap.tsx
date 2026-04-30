@@ -1,7 +1,15 @@
 import React, { forwardRef, useMemo } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 
-import MapLibreGL from '@maplibre/maplibre-react-native';
+import {
+  Camera,
+  GeoJSONSource,
+  Layer,
+  Map,
+  type MapProps,
+  type MapRef,
+  Marker,
+} from '@maplibre/maplibre-react-native';
 import styled from 'styled-components/native';
 
 import { getBounds, getLineCoordinatesFromSegments } from '@activity';
@@ -28,27 +36,11 @@ type Props = {
   tileUrl: string;
   locations: ActivityLocation[] | null | undefined;
   style?: StyleProp<ViewStyle>;
-  attributionPosition?:
-    | {
-        top?: number;
-        left?: number;
-      }
-    | {
-        top?: number;
-        right?: number;
-      }
-    | {
-        bottom?: number;
-        left?: number;
-      }
-    | {
-        bottom?: number;
-        right?: number;
-      };
+  attributionPosition?: MapProps['attributionPosition'];
   onDidFinishRenderingFrameFully?: () => void;
 };
 
-const ActivityMap = forwardRef<MapLibreGL.MapView, Props>(
+const ActivityMap = forwardRef<MapRef, Props>(
   ({ tileUrl, locations, style, attributionPosition, onDidFinishRenderingFrameFully }, ref) => {
     const theme = useTheme();
 
@@ -68,29 +60,25 @@ const ActivityMap = forwardRef<MapLibreGL.MapView, Props>(
       return getLineCoordinatesFromSegments(locations);
     }, [locations]);
 
+    const padding = theme.sizes.activityMapSnapshot.padding;
+
     return (
-      <MapLibreGL.MapView
+      <Map
         ref={ref}
         style={style}
-        styleURL={tileUrl}
-        logoEnabled={false}
+        mapStyle={tileUrl}
+        logo={false}
         attributionPosition={attributionPosition || { bottom: 8, right: 8 }}
-        attributionEnabled
+        attribution
         onDidFinishRenderingFrameFully={onDidFinishRenderingFrameFully}>
-        <MapLibreGL.Camera
-          bounds={{
-            ne: bounds[0],
-            sw: bounds[1],
-            paddingLeft: theme.sizes.activityMapSnapshot.padding,
-            paddingRight: theme.sizes.activityMapSnapshot.padding,
-            paddingTop: theme.sizes.activityMapSnapshot.padding,
-            paddingBottom: theme.sizes.activityMapSnapshot.padding,
-          }}
-          animationDuration={0}
+        <Camera
+          bounds={[bounds[0][0], bounds[0][1], bounds[1][0], bounds[1][1]]}
+          padding={{ top: padding, right: padding, bottom: padding, left: padding }}
+          duration={0}
         />
-        <MapLibreGL.ShapeSource
+        <GeoJSONSource
           id="activityCoordinates"
-          shape={{
+          data={{
             type: 'FeatureCollection',
             features: segmentsCoordinates.map((segmentCoordinates) => ({
               type: 'Feature',
@@ -102,9 +90,10 @@ const ActivityMap = forwardRef<MapLibreGL.MapView, Props>(
             })),
           }}>
           {segmentsCoordinates.map((_, index) => (
-            <MapLibreGL.LineLayer
+            <Layer
               key={`line-layer-${index}`}
-              id="locations"
+              type="line"
+              id={`locations-${index}`}
               style={{
                 lineColor: theme.colors.purple,
                 lineWidth: 5,
@@ -113,10 +102,10 @@ const ActivityMap = forwardRef<MapLibreGL.MapView, Props>(
               }}
             />
           ))}
-        </MapLibreGL.ShapeSource>
-        <MapLibreGL.ShapeSource
+        </GeoJSONSource>
+        <GeoJSONSource
           id="inBetweenSegments"
-          shape={{
+          data={{
             type: 'FeatureCollection',
             features: inBetweenSegmentsCoordinates.map((inBetweenCoordinates) => ({
               type: 'Feature',
@@ -125,9 +114,10 @@ const ActivityMap = forwardRef<MapLibreGL.MapView, Props>(
             })),
           }}>
           {inBetweenSegmentsCoordinates.map((_, index) => (
-            <MapLibreGL.LineLayer
+            <Layer
               key={`in-between-line-layer-${index}`}
-              id="inBetween"
+              type="line"
+              id={`inBetween-${index}`}
               style={{
                 lineDasharray: [2, 2],
                 lineColor: theme.colors.purple,
@@ -137,19 +127,19 @@ const ActivityMap = forwardRef<MapLibreGL.MapView, Props>(
               }}
             />
           ))}
-        </MapLibreGL.ShapeSource>
-        <MapLibreGL.MarkerView coordinate={segmentsCoordinates[0][0]}>
+        </GeoJSONSource>
+        <Marker lngLat={segmentsCoordinates[0][0] as [number, number]}>
           <StartMarker />
-        </MapLibreGL.MarkerView>
-        <MapLibreGL.MarkerView
-          coordinate={
+        </Marker>
+        <Marker
+          lngLat={
             segmentsCoordinates[segmentsCoordinates.length - 1][
               segmentsCoordinates[segmentsCoordinates.length - 1].length - 1
-            ]
+            ] as [number, number]
           }>
           <EndMarker />
-        </MapLibreGL.MarkerView>
-      </MapLibreGL.MapView>
+        </Marker>
+      </Map>
     );
   },
 );

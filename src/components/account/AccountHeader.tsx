@@ -1,18 +1,16 @@
-import React, { type FC, useMemo } from 'react';
+import React, { type FC } from 'react';
 
 import { Link } from 'expo-router';
 
-import { format } from 'date-fns';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
 import { useTheme } from '@theme';
 
-import useAccount from '@api/account/useAccount';
 import useProfilePicture from '@api/profilePicture/useProfilePicture';
 
 import { CameraIcon, SettingsIcon } from '@components/icons';
-import { SecondaryButton, Text } from '@components/ui';
+import { SecondaryButton } from '@components/ui';
 
 import i18n from '@translations/i18n';
 
@@ -49,12 +47,6 @@ const DefaultAvatarWrapper = styled.View`
   background-color: rgba(164, 121, 255, 0.25);
 `;
 
-const Initials = styled(Text)`
-  font-size: 60px;
-  font-weight: bold;
-  color: ${({ theme }) => theme.colors.purple};
-`;
-
 const ProfilePicture = styled.Image`
   width: 100px;
   height: 100px;
@@ -84,10 +76,6 @@ const CameraIconWrapper = styled.View`
   elevation: 5;
 `;
 
-const AccountWrapper = styled.View`
-  margin-bottom: ${({ theme }) => theme.sizes.innerPadding}px;
-`;
-
 const DetailsWrapper = styled.View`
   display: flex;
   flex-direction: column;
@@ -99,25 +87,11 @@ const DetailsWrapper = styled.View`
   background-color: ${({ theme }) => theme.colors.background};
 `;
 
-const UsernameText = styled(Text)`
-  font-size: 20px;
-  font-weight: bold;
-`;
-
 const AccountHeader: FC = () => {
   const { top } = useSafeAreaInsets();
   const theme = useTheme();
 
-  const { data: accountData } = useAccount();
   const { data: profilePictureData } = useProfilePicture();
-
-  const formattedDate = useMemo(() => {
-    if (!accountData?.createdAt) {
-      return '';
-    }
-
-    return `${i18n.t('account.joined')} ${format(accountData.createdAt, 'MMMM do, y')}`;
-  }, [accountData?.createdAt]);
 
   return (
     <Wrapper safeMarginTop={top}>
@@ -127,7 +101,7 @@ const AccountHeader: FC = () => {
             {profilePictureData ? (
               <ProfilePicture source={{ uri: profilePictureData }} />
             ) : (
-              <Initials>{accountData?.username.substring(0, 1).toUpperCase()}</Initials>
+              <CameraIcon width={40} height={40} color={theme.colors.purple} />
             )}
           </DefaultAvatarWrapper>
           <CameraIconWrapper>
@@ -136,10 +110,6 @@ const AccountHeader: FC = () => {
         </ProfilePictureWrapper>
       </Link>
       <DetailsWrapper>
-        <AccountWrapper>
-          <UsernameText>{accountData?.username}</UsernameText>
-          <Text>{formattedDate}</Text>
-        </AccountWrapper>
         <Link href="/settings" asChild>
           <SecondaryButton label={i18n.t('account.buttons.settings')} Icon={SettingsIcon} />
         </Link>

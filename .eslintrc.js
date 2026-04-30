@@ -27,7 +27,6 @@ module.exports = {
               { pattern: '@models/**', group: 'internal' },
               { pattern: '@navigation/**', group: 'internal' },
               { pattern: '@screens/**', group: 'internal' },
-              { pattern: '@subscription/**', group: 'internal' },
               { pattern: '@tasks/**', group: 'internal' },
               { pattern: '@translations/**', group: 'internal' },
               { pattern: '@utils/**', group: 'internal' },
@@ -36,6 +35,12 @@ module.exports = {
             'newlines-between': 'always-and-inside-groups',
           },
         ],
+      },
+    },
+    {
+      files: ['*.js', '*.jsx'],
+      rules: {
+        '@typescript-eslint/explicit-function-return-type': 'off',
       },
     },
   ],

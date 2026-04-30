@@ -20,15 +20,9 @@ export type Activity = {
   toSync?: boolean;
 };
 
-export type EncryptedActivity = Omit<Activity, 'encryptionKey' | 'summary'> & {
-  encryptionKey: string;
-  summary: string;
-};
-
 export type ActivityDate = {
   id: string;
   createdAt: string;
-  encryptionKey: string;
 };
 
 export enum ActivityType {
@@ -55,31 +49,4 @@ export type ActivityTaskState = 'notStarted' | 'recording' | 'paused' | 'stopped
 
 export type NumberActivities = {
   running: number;
-};
-
-export type UploadActivityPayload = {
-  id: string;
-  summary: string;
-  createdAt: string;
-  hasLocations?: boolean;
-  activityEncryptionKey: string;
-};
-
-export type CreateActivityResponse = {
-  id: string;
-};
-
-export type DeleteActivityResponse = {
-  id: string;
-};
-
-export type UpdateActivityResponse = {
-  id: string;
-};
-
-export type UploadActivityResponse = {
-  id: string;
-  url: string;
-  mapUrlDark: string;
-  mapUrlLight: string;
 };

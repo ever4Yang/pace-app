@@ -1,11 +1,10 @@
 import { type SkRRect, rect, rrect } from '@shopify/react-native-skia';
 import { type SharedValue, useDerivedValue, withSpring, withTiming } from 'react-native-reanimated';
 
-import { formatDuration, formatElevation, formatPace, formatSpeed } from '@activity';
+import { formatDuration, formatElevation, formatPace, formatSpeed, getUnitLabels } from '@activity';
 import { useTheme } from '@theme';
 
 import { ActivityType } from '@models/Activity';
-import { DistanceMeasurementSystem } from '@models/UnitSystem';
 
 import type { ChartCursorProps } from '../types';
 
@@ -65,29 +64,34 @@ export default function useCursorValues({
     },
   } = useTheme();
 
+  const unitLabels = getUnitLabels(distanceMeasurementSystem);
+  const { h: unitH, min: unitMin, sec: unitSec } = unitLabels.durationLabels;
+  const unitDistance = unitLabels.distance;
+  const unitPace = unitLabels.pace;
+  const unitSpeed = unitLabels.speed;
+  const unitElevation = unitLabels.elevation;
+
   const formattedDuration = useDerivedValue(
-    () => formatDuration(Math.max(0, timeScale.invert(x.value))),
-    [timeScale, x],
+    () => formatDuration(Math.max(0, timeScale.invert(x.value)), undefined, unitH, unitMin, unitSec),
+    [timeScale, x, unitH, unitMin, unitSec],
   );
 
   const formattedDistance = useDerivedValue(() => {
     const distance = Math.max(0, distanceScale.invert(x.value) / 1000).toFixed(2);
-    return `${distance} ${
-      distanceMeasurementSystem === DistanceMeasurementSystem.METRIC ? 'km' : 'mi'
-    }`;
-  }, [distanceScale, x]);
+    return `${distance} ${unitDistance}`;
+  }, [distanceScale, x, unitDistance]);
 
   const formattedPace = useDerivedValue(() => {
     const currentPace = paceHistogram.histogram[Math.floor(x.value)];
     return activityType === ActivityType.RUNNING
-      ? formatPace(currentPace, distanceMeasurementSystem)
-      : formatSpeed(currentPace, distanceMeasurementSystem);
-  }, [x, distanceMeasurementSystem, paceHistogram]);
+      ? formatPace(currentPace, distanceMeasurementSystem, undefined, unitPace)
+      : formatSpeed(currentPace, distanceMeasurementSystem, undefined, unitSpeed);
+  }, [x, distanceMeasurementSystem, paceHistogram, unitPace, unitSpeed]);
 
   const formattedElevation = useDerivedValue(() => {
     const currentElevation = elevationHistogram.histogram[Math.floor(x.value)];
-    return formatElevation(currentElevation, distanceMeasurementSystem);
-  }, [x, distanceMeasurementSystem, elevationHistogram]);
+    return formatElevation(currentElevation, distanceMeasurementSystem, undefined, unitElevation);
+  }, [x, distanceMeasurementSystem, elevationHistogram, unitElevation]);
 
   const yPace = useDerivedValue(() => {
     const pace = paceHistogram.histogram[Math.floor(x.value)];

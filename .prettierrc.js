@@ -13,7 +13,6 @@ module.exports = {
     '^@api/(.*)$',
     '^@components/(.*)$',
     '^@models/(.*)$',
-    '^@subscription/(.*)$',
     '^@tasks/(.*)$',
     '^@translations/(.*)$',
     '^@utils/(.*)$',

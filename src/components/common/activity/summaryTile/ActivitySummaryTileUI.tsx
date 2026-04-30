@@ -1,9 +1,10 @@
 import React, { type FC, useMemo } from 'react';
 
-import { differenceInDays, format, formatRelative } from 'date-fns';
+import { type Locale, differenceInDays, format, formatRelative } from 'date-fns';
+import { enUS, zhCN } from 'date-fns/locale';
 import styled from 'styled-components/native';
 
-import { formatDistance, formatDuration } from '@activity';
+import { formatDistance, formatDuration, getUnitLabels } from '@activity';
 
 import { ActivityIndicator, Text } from '@components/ui';
 
@@ -11,6 +12,7 @@ import { Activity, ActivitySummary, ActivityType } from '@models/Activity';
 import { DistanceMeasurementSystem } from '@models/UnitSystem';
 
 import i18n from '@translations/i18n';
+import { useLocale } from '@translations/LocaleProvider';
 
 import CyclingSummary from './CyclingSummary';
 import RunningSummary from './RunningSummary';
@@ -78,7 +80,12 @@ type Props = {
   hasError: boolean;
 };
 
+const DATE_FNS_LOCALES: Record<string, Locale> = { en: enUS, zh: zhCN };
+
 const ActivitySummaryTileUI: FC<Props> = ({ activity, distanceMeasurementSystem, hasError }) => {
+  const { locale } = useLocale();
+  const dateFnsLocale = DATE_FNS_LOCALES[locale] ?? enUS;
+
   const activityDate = useMemo(() => {
     if (!activity?.summary) {
       return '';
@@ -88,13 +95,18 @@ const ActivitySummaryTileUI: FC<Props> = ({ activity, distanceMeasurementSystem,
     const createdAtDate = new Date((activity.summary as ActivitySummary).createdAt);
     const relativetoNow = Math.abs(differenceInDays(createdAtDate, now));
     if (relativetoNow < 6) {
-      return formatRelative(createdAtDate, now);
+      return formatRelative(createdAtDate, now, { locale: dateFnsLocale });
     }
 
-    const formattedDate = format(createdAtDate, 'EEEE, LLLL dd, yyyy');
-    const formattedHour = format(createdAtDate, 'h:mm a');
+    const formattedDate = format(createdAtDate, 'EEEE, LLLL dd, yyyy', { locale: dateFnsLocale });
+    const formattedHour = format(createdAtDate, 'h:mm a', { locale: dateFnsLocale });
     return `${formattedDate}, ${i18n.t('activityTile.atHour')} ${formattedHour}`;
-  }, [activity?.summary]);
+  }, [activity?.summary, dateFnsLocale]);
+
+  const unitLabels = useMemo(
+    () => getUnitLabels(distanceMeasurementSystem),
+    [distanceMeasurementSystem],
+  );
 
   const formattedDistance = useMemo(() => {
     if (!activity?.summary) {
@@ -104,16 +116,19 @@ const ActivitySummaryTileUI: FC<Props> = ({ activity, distanceMeasurementSystem,
     return formatDistance(
       (activity.summary as ActivitySummary).distance,
       distanceMeasurementSystem,
+      undefined,
+      unitLabels.distance,
     );
-  }, [activity?.summary, distanceMeasurementSystem]);
+  }, [activity?.summary, distanceMeasurementSystem, unitLabels.distance]);
 
   const formattedDuration = useMemo(() => {
     if (!activity?.summary) {
       return '';
     }
 
-    return formatDuration((activity.summary as ActivitySummary).duration);
-  }, [activity?.summary]);
+    const { h, min, sec } = unitLabels.durationLabels;
+    return formatDuration((activity.summary as ActivitySummary).duration, undefined, h, min, sec);
+  }, [activity?.summary, unitLabels.durationLabels]);
 
   return (
     <Wrapper>

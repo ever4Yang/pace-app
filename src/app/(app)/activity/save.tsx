@@ -52,41 +52,39 @@ const SaveScreen: FC = () => {
   const { data: preferencesData } = usePreferences();
   const {
     isPending: isCreateActivityLoading,
-    mutate: createActivity,
+    mutateAsync: createActivity,
     reset: resetCreateActivity,
   } = useCreateActivity();
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const defaultName = useMemo(() => {
-    const currentHour = new Date().getHours();
+    const now = new Date();
+    const currentHour = now.getHours();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const dateStr = `${month}-${day}`;
+
     const defaultActivityTypeName = i18n.t(
       `saveActivity.form.activityType.${(activityType || ActivityType.RUNNING).toLowerCase()}`,
     );
 
-    if (currentHour < 12) {
-      return i18n.t('saveActivity.form.defaultName.morning', {
-        activityType: defaultActivityTypeName,
-      });
-    }
-    if (currentHour < 18) {
-      return i18n.t('saveActivity.form.defaultName.afternoon', {
-        activityType: defaultActivityTypeName,
-      });
-    }
-
-    return i18n.t('saveActivity.form.defaultName.evening', {
+    const timeOfDay = currentHour < 12 ? 'morning' : currentHour < 18 ? 'afternoon' : 'evening';
+    const baseName = i18n.t(`saveActivity.form.defaultName.${timeOfDay}`, {
       activityType: defaultActivityTypeName,
     });
+
+    return `${baseName} ${dateStr}`;
   }, [activityType]);
 
   const { handleSubmit, formState, ...formMethods } = useForm<FormData>({
     resolver: yupResolver(schema),
     defaultValues: { name: defaultName, type: activityType },
+    mode: 'onChange',
   });
 
   const goToHomeScreen = useCallback((): void => {
-    router.push('/');
+    router.navigate('/');
   }, [router]);
 
   const onCancel = useCallback((navigationEvent?: any): void => {
@@ -113,15 +111,19 @@ const SaveScreen: FC = () => {
         activityTask.startTimestamp,
         activityTask.endTimestamp,
         activityTask.distance,
-        healthInformationData?.healthInformation || null,
+        healthInformationData || null,
       );
 
-      createActivity({
-        summary,
-        locations: [...activityTask.locations],
-        mapSnapshot: activityTask.mapImageLight,
-        mapSnapshotDark: activityTask.mapImageDark,
-      });
+      try {
+        await createActivity({
+          summary,
+          locations: [...activityTask.locations],
+          mapSnapshot: activityTask.mapImageLight,
+          mapSnapshotDark: activityTask.mapImageDark,
+        });
+      } catch {
+        // insertActivity already ran — proceed with navigation
+      }
 
       activityTask.reset();
       navigation.removeListener('beforeRemove', onCancel);
@@ -131,7 +133,7 @@ const SaveScreen: FC = () => {
       activityTask,
       createActivity,
       goToHomeScreen,
-      healthInformationData?.healthInformation,
+      healthInformationData,
       navigation,
       onCancel,
       resetCreateActivity,

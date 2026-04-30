@@ -12,6 +12,10 @@ import { CloseIcon } from '@components/icons';
 
 import type { ActivityLocation } from '@models/Activity';
 
+import { useLocale } from '@translations/LocaleProvider';
+
+import useLocalizedMapStyle from '@utils/useLocalizedMapStyle';
+
 import { MAPTILER_URL_DARK, MAPTILER_URL_LIGHT } from '../../consts';
 
 const ICON_SIZE = 30;
@@ -45,7 +49,12 @@ type Props = {
 const ZoomableMap: FC<Props> = ({ locations }) => {
   const router = useRouter();
   const theme = useTheme();
+  const { locale } = useLocale();
   const { top: marginTop } = useSafeAreaInsets();
+  const tileUrl = useLocalizedMapStyle(
+    theme.dark ? MAPTILER_URL_DARK : MAPTILER_URL_LIGHT,
+    locale,
+  );
 
   const goToActivityDetails = useCallback((): void => {
     router.back();
@@ -54,7 +63,7 @@ const ZoomableMap: FC<Props> = ({ locations }) => {
   return (
     <Wrapper>
       <StyledActivityMap
-        tileUrl={theme.dark ? MAPTILER_URL_DARK : MAPTILER_URL_LIGHT}
+        tileUrl={tileUrl}
         locations={locations}
       />
       <CloseButtonWrapper safeMarginTop={marginTop} onPress={goToActivityDetails}>
