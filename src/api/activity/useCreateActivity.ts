@@ -27,12 +27,19 @@ async function writeMapSnapshot(activityId: string, theme: 'light' | 'dark', dat
     await FileSystem.makeDirectoryAsync(dir, { intermediates: true });
   }
 
+  const destPath = `${dir}${activityId}_${theme}.jpg`;
+
+  if (dataUri.startsWith('file://')) {
+    await FileSystem.copyAsync({ from: dataUri, to: destPath });
+    return;
+  }
+
   const base64 = dataUri.replace(/^data:image\/\w+;base64,/, '');
   if (!base64) {
     return;
   }
 
-  await FileSystem.writeAsStringAsync(`${dir}${activityId}_${theme}.jpg`, base64, {
+  await FileSystem.writeAsStringAsync(destPath, base64, {
     encoding: FileSystem.EncodingType.Base64,
   });
 }
