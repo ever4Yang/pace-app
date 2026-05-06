@@ -1,4 +1,4 @@
-import React, { type FC, useCallback } from 'react';
+import React, { type FC, useCallback, useEffect, useState } from 'react';
 
 import { useRouter } from 'expo-router';
 
@@ -56,16 +56,26 @@ const ZoomableMap: FC<Props> = ({ locations }) => {
     locale,
   );
 
+  const [isLeaving, setIsLeaving] = useState(false);
+
+  useEffect(() => {
+    if (isLeaving) {
+      router.back();
+    }
+  }, [isLeaving, router]);
+
   const goToActivityDetails = useCallback((): void => {
-    router.back();
-  }, [router]);
+    setIsLeaving(true);
+  }, []);
 
   return (
     <Wrapper>
-      <StyledActivityMap
-        tileUrl={tileUrl}
-        locations={locations}
-      />
+      {!isLeaving && (
+        <StyledActivityMap
+          tileUrl={tileUrl}
+          locations={locations}
+        />
+      )}
       <CloseButtonWrapper safeMarginTop={marginTop} onPress={goToActivityDetails}>
         <CloseIcon width={ICON_SIZE} height={ICON_SIZE} />
       </CloseButtonWrapper>

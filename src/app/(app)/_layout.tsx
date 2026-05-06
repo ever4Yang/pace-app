@@ -20,7 +20,10 @@ const AppLayout: FC = () => {
         name="activity/[id]/edit"
         options={{ headerTitle: i18n.t('editActivity.screenTitle') }}
       />
-      <Stack.Screen name="activity/[id]/map" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="activity/[id]/map"
+        options={{ headerShown: false, presentation: 'fullScreenModal', animation: 'none' }}
+      />
       <Stack.Screen
         name="settings/index"
         options={{
