@@ -14,6 +14,7 @@ import TrainingLogSummary from './TrainingLogSummary';
 
 const Wrapper = styled.View`
   flex: 1;
+  background-color: ${({ theme }) => theme.colors.background};
 `;
 
 const ScrollWrapper = styled.ScrollView`

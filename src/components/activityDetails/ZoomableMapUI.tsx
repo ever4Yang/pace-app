@@ -1,6 +1,7 @@
-import React, { type FC, useCallback } from 'react';
+import React, { type FC, useCallback, useEffect } from 'react';
 
 import { useRouter } from 'expo-router';
+import { BackHandler } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
@@ -40,13 +41,15 @@ const CloseButtonWrapper = styled.TouchableOpacity<{ safeMarginTop: number }>`
 
   padding: ${({ theme }) => theme.sizes.innerPadding}px;
   border-radius: 15px;
+  z-index: 10;
 `;
 
 type Props = {
   locations: ActivityLocation[] | undefined;
+  onClose?: () => void;
 };
 
-const ZoomableMap: FC<Props> = ({ locations }) => {
+const ZoomableMap: FC<Props> = ({ locations, onClose }) => {
   const router = useRouter();
   const theme = useTheme();
   const { locale } = useLocale();
@@ -57,8 +60,21 @@ const ZoomableMap: FC<Props> = ({ locations }) => {
   );
 
   const goToActivityDetails = useCallback((): void => {
-    router.back();
-  }, [router]);
+    if (onClose) {
+      onClose();
+    } else {
+      router.back();
+    }
+  }, [onClose, router]);
+
+  useEffect(() => {
+    if (!onClose) return;
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      onClose();
+      return true;
+    });
+    return () => subscription.remove();
+  }, [onClose]);
 
   return (
     <Wrapper>

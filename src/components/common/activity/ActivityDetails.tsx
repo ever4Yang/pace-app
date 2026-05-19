@@ -53,7 +53,7 @@ const ActivityDetails: FC<Props> = ({
   return (
     <>
       <Animated.ScrollView
-        style={{ backgroundColor: theme.colors.background }}
+        style={{ flex: 1, backgroundColor: theme.colors.background }}
         contentContainerStyle={{
           backgroundColor: theme.colors.background,
         }}

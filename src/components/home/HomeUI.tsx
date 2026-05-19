@@ -65,6 +65,7 @@ const HomeUI: FC<Props> = ({
     <>
       <StatusBar translucent />
       <FlatList
+        style={{ flex: 1, backgroundColor: theme.colors.background }}
         data={sortedActivities}
         renderItem={renderItem}
         keyExtractor={keyExtractor}

@@ -37,7 +37,11 @@ const HomeLayout: FC = () => {
     <Tabs
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarStyle: { backgroundColor: theme.colors.background, borderTopWidth: 0 },
+        tabBarStyle: {
+          backgroundColor: theme.colors.background,
+          borderTopWidth: 0,
+          elevation: 0,
+        },
         tabBarActiveTintColor: theme.colors.purple,
         tabBarInactiveTintColor: theme.colors.primary,
         tabBarShowLabel: false,
