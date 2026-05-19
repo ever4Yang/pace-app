@@ -22,7 +22,7 @@ const AppLayout: FC = () => {
       />
       <Stack.Screen
         name="activity/[id]/map"
-        options={{ headerShown: false, presentation: 'fullScreenModal', animation: 'none' }}
+        options={{ headerShown: false, animation: 'none' }}
       />
       <Stack.Screen
         name="settings/index"

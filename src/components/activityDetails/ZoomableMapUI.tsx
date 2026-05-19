@@ -1,6 +1,7 @@
-import React, { type FC, useCallback, useEffect, useState } from 'react';
+import React, { type FC, useCallback, useEffect } from 'react';
 
 import { useRouter } from 'expo-router';
+import { BackHandler } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
@@ -40,13 +41,15 @@ const CloseButtonWrapper = styled.TouchableOpacity<{ safeMarginTop: number }>`
 
   padding: ${({ theme }) => theme.sizes.innerPadding}px;
   border-radius: 15px;
+  z-index: 10;
 `;
 
 type Props = {
   locations: ActivityLocation[] | undefined;
+  onClose?: () => void;
 };
 
-const ZoomableMap: FC<Props> = ({ locations }) => {
+const ZoomableMap: FC<Props> = ({ locations, onClose }) => {
   const router = useRouter();
   const theme = useTheme();
   const { locale } = useLocale();
@@ -56,26 +59,29 @@ const ZoomableMap: FC<Props> = ({ locations }) => {
     locale,
   );
 
-  const [isLeaving, setIsLeaving] = useState(false);
-
-  useEffect(() => {
-    if (isLeaving) {
+  const goToActivityDetails = useCallback((): void => {
+    if (onClose) {
+      onClose();
+    } else {
       router.back();
     }
-  }, [isLeaving, router]);
+  }, [onClose, router]);
 
-  const goToActivityDetails = useCallback((): void => {
-    setIsLeaving(true);
-  }, []);
+  useEffect(() => {
+    if (!onClose) return;
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      onClose();
+      return true;
+    });
+    return () => subscription.remove();
+  }, [onClose]);
 
   return (
     <Wrapper>
-      {!isLeaving && (
-        <StyledActivityMap
-          tileUrl={tileUrl}
-          locations={locations}
-        />
-      )}
+      <StyledActivityMap
+        tileUrl={tileUrl}
+        locations={locations}
+      />
       <CloseButtonWrapper safeMarginTop={marginTop} onPress={goToActivityDetails}>
         <CloseIcon width={ICON_SIZE} height={ICON_SIZE} />
       </CloseButtonWrapper>

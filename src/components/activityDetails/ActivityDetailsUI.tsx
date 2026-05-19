@@ -1,6 +1,7 @@
-import React, { type FC, useCallback, useRef } from 'react';
+import React, { type FC, useCallback, useEffect, useRef, useState } from 'react';
 
 import { useRouter } from 'expo-router';
+import { BackHandler } from 'react-native';
 
 import { type BottomSheetModal } from '@gorhom/bottom-sheet';
 import styled from 'styled-components/native';
@@ -19,6 +20,7 @@ import type { DistanceMeasurementSystem } from '@models/UnitSystem';
 import i18n from '@translations/i18n';
 
 import EditActivityBottomSheet from './EditActivityBottomSheet';
+import ZoomableMap from './ZoomableMapUI';
 
 const Wrapper = styled.ScrollView`
   background-color: ${({ theme }) => theme.colors.background};
@@ -35,12 +37,22 @@ type Props = {
   onDeleteActivity: () => void;
 };
 
+const FullscreenMapOverlay = styled.View`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+`;
+
 const ActivityDetailsUI: FC<Props> = ({
   activity,
   distanceMeasurementSystem,
   onDeleteActivity,
 }) => {
   const editActivityBottomSheetRef = useRef<BottomSheetModal>(null);
+  const [isFullscreenMapVisible, setIsFullscreenMapVisible] = useState(false);
 
   const router = useRouter();
   const theme = useTheme();
@@ -62,13 +74,22 @@ const ActivityDetailsUI: FC<Props> = ({
     activityId: activity?.id,
   });
 
-  const goToZoomableMap = useCallback((): void => {
-    if (!activity) {
-      return;
-    }
+  const showFullscreenMap = useCallback((): void => {
+    setIsFullscreenMapVisible(true);
+  }, []);
 
-    router.push(`/activity/${activity.id}/map`);
-  }, [activity, router]);
+  const hideFullscreenMap = useCallback((): void => {
+    setIsFullscreenMapVisible(false);
+  }, []);
+
+  useEffect(() => {
+    if (!isFullscreenMapVisible) return;
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      hideFullscreenMap();
+      return true;
+    });
+    return () => subscription.remove();
+  }, [isFullscreenMapVisible, hideFullscreenMap]);
 
   const goToEditActivity = useCallback((): void => {
     editActivityBottomSheetRef.current?.dismiss();
@@ -126,7 +147,7 @@ const ActivityDetailsUI: FC<Props> = ({
         onEdit={() => {
           editActivityBottomSheetRef.current?.present();
         }}
-        onPressMap={goToZoomableMap}
+        onPressMap={showFullscreenMap}
         onGoBack={goBack}
       />
       <EditActivityBottomSheet
@@ -134,6 +155,14 @@ const ActivityDetailsUI: FC<Props> = ({
         onEditActivity={goToEditActivity}
         onDeleteActivity={deleteActivity}
       />
+      {isFullscreenMapVisible && (
+        <FullscreenMapOverlay>
+          <ZoomableMap
+            locations={activityLocationsData?.locations}
+            onClose={hideFullscreenMap}
+          />
+        </FullscreenMapOverlay>
+      )}
     </>
   );
 };
